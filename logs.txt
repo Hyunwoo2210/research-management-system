@@ -1,0 +1,155 @@
+
+> my-v0-project@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+ ⚠ Port 3001 is in use, trying 3002 instead.
+ ⚠ Port 3002 is in use, trying 3003 instead.
+   ▲ Next.js 15.2.4
+   - Local:        http://localhost:3003
+   - Network:      http://192.168.123.100:3003
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1991ms
+ ○ Compiling /schedule ...
+ ✓ Compiled /schedule in 2.5s (954 modules)
+ GET /schedule 200 in 8489ms
+ ✓ Compiled in 6.1s (437 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 606ms (953 modules)
+ GET / 200 in 965ms
+ ✓ Compiled /_not-found in 354ms (957 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 638ms
+ ○ Compiling /api/notes ...
+ ✓ Compiled /api/notes in 711ms (977 modules)
+ GET /api/notes 200 in 6762ms
+ ✓ Compiled /api/papers in 301ms (979 modules)
+ GET /api/papers 200 in 2521ms
+ ✓ Compiled /api/projects in 259ms (981 modules)
+ GET /api/projects 200 in 2118ms
+ ✓ Compiled /api/tasks in 195ms (983 modules)
+ GET /api/tasks 200 in 2167ms
+ ✓ Compiled /api/achievements in 203ms (985 modules)
+ GET /api/achievements 200 in 1997ms
+ GET /schedule 200 in 62ms
+ GET /api/projects 200 in 1737ms
+ GET /api/projects 200 in 200ms
+ GET /api/tasks 200 in 1743ms
+ GET /api/tasks 200 in 204ms
+ GET /api/papers 200 in 2121ms
+ GET /api/papers 200 in 386ms
+ POST /api/projects 200 in 2920ms
+ ✓ Compiled in 435ms (443 modules)
+ GET /schedule 200 in 53ms
+ ✓ Compiled in 186ms (443 modules)
+ GET /schedule 200 in 48ms
+ ✓ Compiled in 177ms (443 modules)
+ GET /schedule 200 in 44ms
+ ✓ Compiled in 227ms (443 modules)
+ GET /schedule 200 in 50ms
+ ✓ Compiled in 149ms (443 modules)
+ GET /schedule 200 in 54ms
+ ✓ Compiled in 154ms (443 modules)
+ GET /schedule 200 in 50ms
+ ✓ Compiled in 135ms (443 modules)
+ GET /schedule 200 in 45ms
+ ✓ Compiled in 131ms (443 modules)
+ GET /schedule 200 in 45ms
+ ✓ Compiled in 242ms (443 modules)
+ GET /schedule 200 in 52ms
+ ✓ Compiled in 201ms (443 modules)
+ GET /schedule 200 in 49ms
+ ✓ Compiled in 196ms (443 modules)
+ GET /schedule 200 in 47ms
+ ✓ Compiled in 226ms (443 modules)
+ GET /schedule 200 in 46ms
+ ✓ Compiled in 149ms (443 modules)
+ GET /schedule 200 in 51ms
+ ✓ Compiled in 148ms (443 modules)
+ GET /schedule 200 in 41ms
+ ✓ Compiled in 134ms (443 modules)
+ GET /schedule 200 in 46ms
+ ✓ Compiled in 218ms (443 modules)
+ GET /schedule 200 in 50ms
+ ✓ Compiled in 170ms (443 modules)
+ GET /schedule 200 in 49ms
+ ✓ Compiled in 157ms (443 modules)
+ GET /schedule 200 in 45ms
+ ✓ Compiled in 227ms (443 modules)
+ GET /schedule 200 in 50ms
+ ✓ Compiled in 202ms (443 modules)
+ GET /schedule 200 in 47ms
+ ✓ Compiled in 155ms (443 modules)
+ GET /schedule 200 in 53ms
+ ✓ Compiled in 258ms (443 modules)
+ GET /schedule 200 in 52ms
+ GET / 200 in 47ms
+ ✓ Compiled in 187ms (443 modules)
+ GET / 200 in 50ms
+ GET /api/notes 200 in 1772ms
+ GET /api/notes 200 in 314ms
+ ✓ Compiled in 265ms (443 modules)
+ GET / 200 in 48ms
+ GET /api/papers 200 in 635ms
+ GET /api/papers 200 in 415ms
+ ✓ Compiled in 199ms (443 modules)
+ GET /api/projects 200 in 1217ms
+ GET / 200 in 50ms
+ GET /api/tasks 200 in 443ms
+ GET /api/achievements 200 in 435ms
+ GET /api/projects 200 in 1037ms
+ GET /api/tasks 200 in 199ms
+ GET /api/achievements 200 in 193ms
+ ✓ Compiled in 231ms (443 modules)
+ GET / 200 in 52ms
+ ✓ Compiled in 156ms (443 modules)
+ GET / 200 in 50ms
+ ✓ Compiled in 229ms (443 modules)
+ GET / 200 in 58ms
+ ✓ Compiled in 172ms (443 modules)
+ GET / 200 in 42ms
+ ✓ Compiled in 245ms (443 modules)
+ GET / 200 in 47ms
+ GET /schedule 200 in 205ms
+ ✓ Compiled in 234ms (443 modules)
+ GET /schedule 200 in 49ms
+ GET /api/projects 200 in 990ms
+ GET /api/tasks 200 in 283ms
+ ⨯ [Error: UNKNOWN: unknown error, open 'C:\Users\estoc\cursor_project\research_management_0702\final_reserch_manage\.next\static\chunks\app\layout.js'] {
+  errno: -4094,
+  code: 'UNKNOWN',
+  syscall: 'open',
+  path: 'C:\\Users\\estoc\\cursor_project\\research_management_0702\\final_reserch_manage\\.next\\static\\chunks\\app\\layout.js'
+}
+[Error: UNKNOWN: unknown error, open 'C:\Users\estoc\cursor_project\research_management_0702\final_reserch_manage\.next\static\chunks\app\layout.js'] {
+  errno: -4094,
+  code: 'UNKNOWN',
+  syscall: 'open',
+  path: 'C:\\Users\\estoc\\cursor_project\\research_management_0702\\final_reserch_manage\\.next\\static\\chunks\\app\\layout.js'
+}
+[Error: UNKNOWN: unknown error, open 'C:\Users\estoc\cursor_project\research_management_0702\final_reserch_manage\.next\static\chunks\app\layout.js'] {
+  errno: -4094,
+  code: 'UNKNOWN',
+  syscall: 'open',
+  path: 'C:\\Users\\estoc\\cursor_project\\research_management_0702\\final_reserch_manage\\.next\\static\\chunks\\app\\layout.js'
+}
+ GET /api/projects 200 in 968ms
+ ⨯ [Error: UNKNOWN: unknown error, open 'C:\Users\estoc\cursor_project\research_management_0702\final_reserch_manage\.next\static\chunks\app\layout.js'] {
+  errno: -4094,
+  code: 'UNKNOWN',
+  syscall: 'open',
+  path: 'C:\\Users\\estoc\\cursor_project\\research_management_0702\\final_reserch_manage\\.next\\static\\chunks\\app\\layout.js'
+}
+[Error: UNKNOWN: unknown error, open 'C:\Users\estoc\cursor_project\research_management_0702\final_reserch_manage\.next\static\chunks\app\layout.js'] {
+  errno: -4094,
+  code: 'UNKNOWN',
+  syscall: 'open',
+  path: 'C:\\Users\\estoc\\cursor_project\\research_management_0702\\final_reserch_manage\\.next\\static\\chunks\\app\\layout.js'
+}
+[Error: UNKNOWN: unknown error, open 'C:\Users\estoc\cursor_project\research_management_0702\final_reserch_manage\.next\static\chunks\app\layout.js'] {
+  errno: -4094,
+  code: 'UNKNOWN',
+  syscall: 'open',
+  path: 'C:\\Users\\estoc\\cursor_project\\research_management_0702\\final_reserch_manage\\.next\\static\\chunks\\app\\layout.js'
+}
