@@ -27,6 +27,7 @@ export function ExpertDialog({ expert, onSave, onClose }: ExpertDialogProps) {
   const [filePath, setFilePath] = useState(expert?.filePath || "")
   const [fileName, setFileName] = useState(expert?.fileName || "")
   const [fileSize, setFileSize] = useState(expert?.fileSize || "")
+  const [fileKey, setFileKey] = useState("")
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -57,6 +58,7 @@ export function ExpertDialog({ expert, onSave, onClose }: ExpertDialogProps) {
       setFilePath("")
       setFileName("")
       setFileSize("")
+      setFileKey("")
     }
   }
 
@@ -80,12 +82,14 @@ export function ExpertDialog({ expert, onSave, onClose }: ExpertDialogProps) {
     setIsUploading(true)
 
     try {
-      const result = await uploadFile(file)
+      const result = await uploadFile(file, "expertUploader")
 
       setFileName(result.fileName)
       setFilePath(result.url)
       setFileSize(result.fileSize)
+      setFileKey(result.key)
     } catch (error) {
+      console.error("파일 업로드 오류:", error)
       setUploadError("파일 업로드 중 오류가 발생했습니다.")
     } finally {
       setIsUploading(false)
@@ -96,6 +100,7 @@ export function ExpertDialog({ expert, onSave, onClose }: ExpertDialogProps) {
     setFileName("")
     setFilePath("")
     setFileSize("")
+    setFileKey("")
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }

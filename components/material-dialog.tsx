@@ -90,7 +90,7 @@ export function MaterialDialog({ material, onSave, onClose }: MaterialDialogProp
     setIsUploading(true)
 
     try {
-      const result = await uploadFile(file)
+      const result = await uploadFile(file, "materialUploader")
 
       // 파일 정보 자동 설정
       setFileName(result.fileName)
@@ -106,6 +106,7 @@ export function MaterialDialog({ material, onSave, onClose }: MaterialDialogProp
       const detectedType = getFileType(file.name)
       setFileType(detectedType)
     } catch (error) {
+      console.error("파일 업로드 오류:", error)
       setUploadError("파일 업로드 중 오류가 발생했습니다.")
     } finally {
       setIsUploading(false)

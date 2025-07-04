@@ -9,20 +9,20 @@ export async function GET(
 ) {
   try {
     const id = parseInt(params.id);
-    const paper = await prisma.paper.findUnique({
+    const expert = await prisma.expert.findUnique({
       where: { id },
       include: {
         projects: true
       }
     });
     
-    if (!paper) {
-      return NextResponse.json({ error: "Paper not found" }, { status: 404 });
+    if (!expert) {
+      return NextResponse.json({ error: "Expert not found" }, { status: 404 });
     }
     
-    return NextResponse.json(paper);
+    return NextResponse.json(expert);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch paper" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch expert" }, { status: 500 });
   }
 }
 
@@ -33,15 +33,16 @@ export async function PUT(
   try {
     const id = parseInt(params.id);
     const body = await request.json();
-    const { title, authors, year, publisher, notes, filePath, fileName, fileSize, projectIds } = body;
+    const { name, affiliation, expertise, email, phone, notes, filePath, fileName, fileSize, projectIds } = body;
     
-    const paper = await prisma.paper.update({
+    const expert = await prisma.expert.update({
       where: { id },
       data: {
-        title,
-        authors,
-        year,
-        publisher,
+        name,
+        affiliation,
+        expertise,
+        email,
+        phone,
         notes,
         filePath,
         fileName,
@@ -55,9 +56,9 @@ export async function PUT(
       }
     });
     
-    return NextResponse.json(paper);
+    return NextResponse.json(expert);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update paper" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update expert" }, { status: 500 });
   }
 }
 
@@ -67,12 +68,12 @@ export async function DELETE(
 ) {
   try {
     const id = parseInt(params.id);
-    await prisma.paper.delete({
+    await prisma.expert.delete({
       where: { id }
     });
     
-    return NextResponse.json({ message: "Paper deleted" });
+    return NextResponse.json({ message: "Expert deleted" });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to delete paper" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete expert" }, { status: 500 });
   }
 }

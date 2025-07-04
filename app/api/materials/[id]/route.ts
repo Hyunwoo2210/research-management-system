@@ -9,20 +9,20 @@ export async function GET(
 ) {
   try {
     const id = parseInt(params.id);
-    const paper = await prisma.paper.findUnique({
+    const material = await prisma.material.findUnique({
       where: { id },
       include: {
         projects: true
       }
     });
     
-    if (!paper) {
-      return NextResponse.json({ error: "Paper not found" }, { status: 404 });
+    if (!material) {
+      return NextResponse.json({ error: "Material not found" }, { status: 404 });
     }
     
-    return NextResponse.json(paper);
+    return NextResponse.json(material);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch paper" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch material" }, { status: 500 });
   }
 }
 
@@ -33,19 +33,18 @@ export async function PUT(
   try {
     const id = parseInt(params.id);
     const body = await request.json();
-    const { title, authors, year, publisher, notes, filePath, fileName, fileSize, projectIds } = body;
+    const { title, description, fileType, filePath, fileName, fileSize, tags, projectIds } = body;
     
-    const paper = await prisma.paper.update({
+    const material = await prisma.material.update({
       where: { id },
       data: {
         title,
-        authors,
-        year,
-        publisher,
-        notes,
+        description,
+        fileType,
         filePath,
         fileName,
         fileSize,
+        tags,
         projects: {
           set: projectIds?.map(id => ({ id: Number(id) })) || []
         }
@@ -55,9 +54,9 @@ export async function PUT(
       }
     });
     
-    return NextResponse.json(paper);
+    return NextResponse.json(material);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update paper" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update material" }, { status: 500 });
   }
 }
 
@@ -67,12 +66,12 @@ export async function DELETE(
 ) {
   try {
     const id = parseInt(params.id);
-    await prisma.paper.delete({
+    await prisma.material.delete({
       where: { id }
     });
     
-    return NextResponse.json({ message: "Paper deleted" });
+    return NextResponse.json({ message: "Material deleted" });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to delete paper" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete material" }, { status: 500 });
   }
 }

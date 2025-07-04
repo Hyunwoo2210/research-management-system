@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Search, Plus, Edit, Trash2, Tag, FileText, Loader2 } from "lucide-react"
+import { Search, Plus, Edit, Trash2, Tag, FileText, Loader2, Eye } from "lucide-react"
 import Link from "next/link"
 
 export default function NotesPage() {
@@ -24,6 +24,8 @@ export default function NotesPage() {
   const [selectedTag, setSelectedTag] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingNote, setEditingNote] = useState(null)
+  const [viewingNote, setViewingNote] = useState(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -220,10 +222,16 @@ export default function NotesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredNotes.map((note) => (
-              <Card key={note.id} className="hover:shadow-md transition-shadow">
+              <Card key={note.id} className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div className="flex-1">
+                    <div 
+                      className="flex-1"
+                      onClick={() => {
+                        setViewingNote(note)
+                        setIsViewDialogOpen(true)
+                      }}
+                    >
                       <CardTitle className="text-lg">{note.title}</CardTitle>
                       <CardDescription className="mt-1">
                         작성: {new Date(note.createdAt).toLocaleDateString()} | 
@@ -234,7 +242,8 @@ export default function NotesPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation()
                           setEditingNote(note)
                           setIsDialogOpen(true)
                         }}
@@ -244,14 +253,22 @@ export default function NotesPage() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        onClick={() => handleDeleteNote(note.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteNote(note.id)
+                        }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent 
+                  onClick={() => {
+                    setViewingNote(note)
+                    setIsViewDialogOpen(true)
+                  }}
+                >
                   <p className="text-gray-600 text-sm mb-3 line-clamp-3">
                     {note.content.replace(/[#*]/g, "").substring(0, 100)}...
                   </p>
@@ -279,7 +296,88 @@ export default function NotesPage() {
           </div>
         )}
       </main>
+
+      {/* 세부보기 다이얼로그 */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <NoteViewDialog
+          note={viewingNote}
+          onEdit={() => {
+            setEditingNote(viewingNote)
+            setIsViewDialogOpen(false)
+            setIsDialogOpen(true)
+          }}
+          onDelete={() => {
+            if (viewingNote) {
+              handleDeleteNote(viewingNote.id)
+              setIsViewDialogOpen(false)
+            }
+          }}
+          onClose={() => {
+            setIsViewDialogOpen(false)
+            setViewingNote(null)
+          }}
+        />
+      </Dialog>
     </div>
+  )
+}
+
+function NoteViewDialog({ note, onEdit, onDelete, onClose }) {
+  if (!note) return null
+
+  const formatContent = (content) => {
+    // 간단한 마크다운 렌더링
+    return content
+      .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold mt-4 mb-2">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold">$1</strong>')
+      .replace(/\*(.*?)\*/gim, '<em class="italic">$1</em>')
+      .replace(/\n/g, '<br />')
+  }
+
+  return (
+    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="text-2xl">{note.title}</DialogTitle>
+        <DialogDescription>
+          작성: {new Date(note.createdAt).toLocaleDateString()} | 
+          수정: {new Date(note.updatedAt).toLocaleDateString()}
+        </DialogDescription>
+      </DialogHeader>
+      
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-2">
+          {note.tags.map((tag) => (
+            <Badge key={tag} variant="secondary">
+              <Tag className="w-3 h-3 mr-1" />
+              {tag}
+            </Badge>
+          ))}
+        </div>
+        
+        <div className="prose max-w-none">
+          <div 
+            className="text-gray-700 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: formatContent(note.content) }}
+          />
+        </div>
+      </div>
+      
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose}>
+          닫기
+        </Button>
+        <Button variant="outline" onClick={onEdit}>
+          <Edit className="w-4 h-4 mr-2" />
+          수정
+        </Button>
+        <Button variant="destructive" onClick={onDelete}>
+          <Trash2 className="w-4 h-4 mr-2" />
+          삭제
+        </Button>
+      </DialogFooter>
+    </DialogContent>
   )
 }
 

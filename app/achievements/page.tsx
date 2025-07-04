@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Search, Plus, Edit, Trash2, Trophy, Award, BookOpen, Presentation } from "lucide-react"
+import { Search, Plus, Edit, Trash2, Trophy, Award, BookOpen, Presentation, Loader2, Eye } from "lucide-react"
 import Link from "next/link"
 
 export default function AchievementsPage() {
@@ -24,42 +24,38 @@ export default function AchievementsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingAchievement, setEditingAchievement] = useState(null)
   const [selectedType, setSelectedType] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [viewingAchievement, setViewingAchievement] = useState(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
 
-  // 모의 데이터
-  const [achievements, setAchievements] = useState([
-    {
-      id: 1,
-      title: "국제 미디어 학술대회 발표",
-      achievementDate: "2024-01-10",
-      description: "미디어 리터러시 교육 방안에 대한 연구 결과를 국제 학술대회에서 발표",
-      type: "presentation",
-      createdAt: "2024-01-10",
-    },
-    {
-      id: 2,
-      title: "Journal of Media Studies 논문 게재",
-      achievementDate: "2023-12-15",
-      description: "소셜미디어 알고리즘이 여론 형성에 미치는 영향에 대한 연구 논문 게재",
-      type: "publication",
-      createdAt: "2023-12-15",
-    },
-    {
-      id: 3,
-      title: "연구 우수상 수상",
-      achievementDate: "2023-11-20",
-      description: "대학원 연구 우수상 수상 (가짜뉴스 탐지 시스템 연구)",
-      type: "award",
-      createdAt: "2023-11-20",
-    },
-    {
-      id: 4,
-      title: "Communication Research Quarterly 논문 게재",
-      achievementDate: "2023-10-05",
-      description: "디지털 미디어와 민주주의에 관한 연구 논문 게재",
-      type: "publication",
-      createdAt: "2023-10-05",
-    },
-  ])
+  // 실제 데이터 상태
+  const [achievements, setAchievements] = useState([])
+
+  // API 호출로 데이터 가져오기
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      try {
+        setIsLoading(true)
+        setError("")
+        const response = await fetch('/api/achievements')
+        
+        if (!response.ok) {
+          throw new Error("성과 목록을 불러오는데 실패했습니다")
+        }
+        
+        const data = await response.json()
+        setAchievements(data)
+      } catch (error) {
+        console.error('성과 가져오기 실패:', error)
+        setError("성과 목록을 불러오는데 문제가 발생했습니다. 잠시 후 다시 시도해주세요.")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchAchievements()
+  }, [])
 
   const achievementTypes = [
     { value: "publication", label: "논문 게재", icon: BookOpen },
@@ -80,31 +76,79 @@ export default function AchievementsPage() {
     return matchesSearch && matchesType
   })
 
-  const handleSaveAchievement = (achievementData) => {
-    if (editingAchievement) {
-      setAchievements(
-        achievements.map((achievement) =>
-          achievement.id === editingAchievement.id ? { ...achievement, ...achievementData } : achievement,
-        ),
-      )
-    } else {
-      const newAchievement = {
-        id: Date.now(),
-        ...achievementData,
-        createdAt: new Date().toISOString().split("T")[0],
+  const handleSaveAchievement = async (achievementData) => {
+    try {
+      setIsLoading(true)
+      setError("")
+      
+      if (editingAchievement) {
+        // 기존 성과 수정
+        const response = await fetch(`/api/achievements/${editingAchievement.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(achievementData)
+        })
+        
+        if (!response.ok) {
+          throw new Error("성과 수정에 실패했습니다")
+        }
+        
+        const updatedAchievement = await response.json()
+        
+        setAchievements(achievements.map((achievement) =>
+          achievement.id === editingAchievement.id ? updatedAchievement : achievement
+        ))
+      } else {
+        // 새 성과 추가
+        const response = await fetch('/api/achievements', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(achievementData)
+        })
+        
+        if (!response.ok) {
+          throw new Error("성과 생성에 실패했습니다")
+        }
+        
+        const newAchievement = await response.json()
+        
+        setAchievements([newAchievement, ...achievements])
       }
-      setAchievements([newAchievement, ...achievements])
+      
+      setIsDialogOpen(false)
+      setEditingAchievement(null)
+    } catch (error) {
+      console.error('성과 저장 실패:', error)
+      setError("성과를 저장하는데 문제가 발생했습니다. 잠시 후 다시 시도해주세요.")
+    } finally {
+      setIsLoading(false)
     }
-    setIsDialogOpen(false)
-    setEditingAchievement(null)
   }
 
-  const handleDeleteAchievement = (id) => {
-    setAchievements(achievements.filter((achievement) => achievement.id !== id))
+  const handleDeleteAchievement = async (id) => {
+    try {
+      setIsLoading(true)
+      setError("")
+      
+      const response = await fetch(`/api/achievements/${id}`, {
+        method: 'DELETE'
+      })
+      
+      if (!response.ok) {
+        throw new Error("성과 삭제에 실패했습니다")
+      }
+      
+      setAchievements(achievements.filter((achievement) => achievement.id !== id))
+    } catch (error) {
+      console.error('성과 삭제 실패:', error)
+      setError("성과를 삭제하는데 문제가 발생했습니다. 잠시 후 다시 시도해주세요.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const getAchievementsByYear = () => {
-    const grouped = achievements.reduce((acc, achievement) => {
+    const grouped = filteredAchievements.reduce((acc, achievement) => {
       const year = new Date(achievement.achievementDate).getFullYear()
       if (!acc[year]) acc[year] = []
       acc[year].push(achievement)
@@ -130,7 +174,7 @@ export default function AchievementsPage() {
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={() => setEditingAchievement(null)}>
+                <Button onClick={() => setEditingAchievement(null)} disabled={isLoading}>
                   <Plus className="w-4 h-4 mr-2" />
                   성과 추가
                 </Button>
@@ -149,6 +193,12 @@ export default function AchievementsPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="bg-red-50 text-red-700 p-4 rounded-md mb-6">
+            {error}
+          </div>
+        )}
+        
         <div className="mb-6 space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -157,11 +207,17 @@ export default function AchievementsPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
+              disabled={isLoading}
             />
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button variant={selectedType === "" ? "default" : "outline"} size="sm" onClick={() => setSelectedType("")}>
+            <Button 
+              variant={selectedType === "" ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setSelectedType("")}
+              disabled={isLoading}
+            >
               전체
             </Button>
             {achievementTypes.map((type) => {
@@ -172,6 +228,7 @@ export default function AchievementsPage() {
                   variant={selectedType === type.value ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSelectedType(type.value)}
+                  disabled={isLoading}
                 >
                   <Icon className="w-3 h-3 mr-1" />
                   {type.label}
@@ -181,86 +238,107 @@ export default function AchievementsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-          {achievementTypes.map((type) => {
-            const count = achievements.filter((a) => a.type === type.value).length
-            const Icon = type.icon
-            return (
-              <Card key={type.value}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{type.label}</CardTitle>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{count}</div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+            <span className="ml-2 text-gray-600">데이터를 불러오는 중...</span>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+              {achievementTypes.map((type) => {
+                const count = achievements.filter((a) => a.type === type.value).length
+                const Icon = type.icon
+                return (
+                  <Card key={type.value}>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">{type.label}</CardTitle>
+                      <Icon className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{count}</div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
 
-        <div className="space-y-8">
-          {getAchievementsByYear().map(({ year, achievements: yearAchievements }) => (
-            <div key={year}>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">{year}년</h2>
-              <div className="space-y-4">
-                {yearAchievements
-                  .filter((achievement) => {
-                    const matchesSearch =
-                      achievement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                      achievement.description.toLowerCase().includes(searchTerm.toLowerCase())
-                    const matchesType = selectedType === "" || achievement.type === selectedType
-                    return matchesSearch && matchesType
-                  })
-                  .sort((a, b) => new Date(b.achievementDate) - new Date(a.achievementDate))
-                  .map((achievement) => {
-                    const typeInfo = getTypeInfo(achievement.type)
-                    const Icon = typeInfo.icon
-                    return (
-                      <Card key={achievement.id} className="hover:shadow-md transition-shadow">
-                        <CardHeader>
-                          <div className="flex justify-between items-start">
-                            <div className="flex items-start gap-3 flex-1">
-                              <div className="p-2 bg-blue-100 rounded-lg">
-                                <Icon className="w-5 h-5 text-blue-600" />
-                              </div>
-                              <div className="flex-1">
-                                <CardTitle className="text-lg">{achievement.title}</CardTitle>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant="secondary">{typeInfo.label}</Badge>
-                                  <span className="text-sm text-gray-500">{achievement.achievementDate}</span>
+            <div className="space-y-8">
+              {getAchievementsByYear().map(({ year, achievements: yearAchievements }) => (
+                <div key={year}>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{year}년</h2>
+                  <div className="space-y-4">
+                    {yearAchievements
+                      .sort((a, b) => new Date(b.achievementDate) - new Date(a.achievementDate))
+                      .map((achievement) => {
+                        const typeInfo = getTypeInfo(achievement.type)
+                        const Icon = typeInfo.icon
+                        return (
+                          <Card key={achievement.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                            <CardHeader>
+                              <div className="flex justify-between items-start">
+                                <div 
+                                  className="flex items-start gap-3 flex-1"
+                                  onClick={() => {
+                                    setViewingAchievement(achievement)
+                                    setIsViewDialogOpen(true)
+                                  }}
+                                >
+                                  <div className="p-2 bg-blue-100 rounded-lg">
+                                    <Icon className="w-5 h-5 text-blue-600" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <CardTitle className="text-lg">{achievement.title}</CardTitle>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <Badge variant="secondary">{typeInfo.label}</Badge>
+                                      <span className="text-sm text-gray-500">{new Date(achievement.achievementDate).toLocaleDateString()}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setEditingAchievement(achievement)
+                                      setIsDialogOpen(true)
+                                    }}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleDeleteAchievement(achievement.id)
+                                    }}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
                                 </div>
                               </div>
-                            </div>
-                            <div className="flex gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setEditingAchievement(achievement)
-                                  setIsDialogOpen(true)
-                                }}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm" onClick={() => handleDeleteAchievement(achievement.id)}>
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-gray-600">{achievement.description}</p>
-                        </CardContent>
-                      </Card>
-                    )
-                  })}
-              </div>
+                            </CardHeader>
+                            <CardContent 
+                              onClick={() => {
+                                setViewingAchievement(achievement)
+                                setIsViewDialogOpen(true)
+                              }}
+                            >
+                              <p className="text-gray-600">{achievement.description}</p>
+                            </CardContent>
+                          </Card>
+                        )
+                      })}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
 
-        {filteredAchievements.length === 0 && (
+        {!isLoading && filteredAchievements.length === 0 && (
           <div className="text-center py-12">
             <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">성과가 없습니다</h3>
@@ -272,7 +350,117 @@ export default function AchievementsPage() {
           </div>
         )}
       </main>
+
+      {/* 세부보기 다이얼로그 */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <AchievementViewDialog
+          achievement={viewingAchievement}
+          onEdit={() => {
+            setEditingAchievement(viewingAchievement)
+            setIsViewDialogOpen(false)
+            setIsDialogOpen(true)
+          }}
+          onDelete={() => {
+            if (viewingAchievement) {
+              handleDeleteAchievement(viewingAchievement.id)
+              setIsViewDialogOpen(false)
+            }
+          }}
+          onClose={() => {
+            setIsViewDialogOpen(false)
+            setViewingAchievement(null)
+          }}
+        />
+      </Dialog>
     </div>
+  )
+}
+
+function AchievementViewDialog({ achievement, onEdit, onDelete, onClose }) {
+  if (!achievement) return null
+
+  const achievementTypes = [
+    { value: "publication", label: "논문 게재", icon: BookOpen },
+    { value: "presentation", label: "학술 발표", icon: Presentation },
+    { value: "award", label: "수상", icon: Award },
+    { value: "other", label: "기타", icon: Trophy },
+  ]
+
+  const getTypeInfo = (type) => {
+    return achievementTypes.find((t) => t.value === type) || achievementTypes[3]
+  }
+
+  const typeInfo = getTypeInfo(achievement.type)
+  const Icon = typeInfo.icon
+
+  return (
+    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="text-2xl flex items-center gap-3">
+          <div className="p-3 bg-blue-100 rounded-lg">
+            <Icon className="w-6 h-6 text-blue-600" />
+          </div>
+          {achievement.title}
+        </DialogTitle>
+        <DialogDescription className="text-lg">
+          <div className="flex items-center gap-3 mt-2">
+            <Badge variant="secondary" className="text-sm px-3 py-1">
+              {typeInfo.label}
+            </Badge>
+            <span className="text-gray-600">
+              {new Date(achievement.achievementDate).toLocaleDateString()}
+            </span>
+          </div>
+        </DialogDescription>
+      </DialogHeader>
+      
+      <div className="space-y-6">
+        {/* 설명 */}
+        {achievement.description && (
+          <div>
+            <h4 className="font-semibold text-lg mb-3">상세 설명</h4>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {achievement.description}
+              </p>
+            </div>
+          </div>
+        )}
+        
+        {/* 메타데이터 */}
+        <div>
+          <h4 className="font-semibold text-lg mb-3">정보</h4>
+          <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="font-medium text-gray-600">성과 유형:</span>
+              <span>{typeInfo.label}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-medium text-gray-600">성과 날짜:</span>
+              <span>{new Date(achievement.achievementDate).toLocaleDateString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-medium text-gray-600">등록일:</span>
+              <span>{new Date(achievement.createdAt).toLocaleDateString()}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose}>
+          닫기
+        </Button>
+        <Button variant="outline" onClick={onEdit}>
+          <Edit className="w-4 h-4 mr-2" />
+          수정
+        </Button>
+        <Button variant="destructive" onClick={onDelete}>
+          <Trash2 className="w-4 h-4 mr-2" />
+          삭제
+        </Button>
+      </DialogFooter>
+    </DialogContent>
   )
 }
 

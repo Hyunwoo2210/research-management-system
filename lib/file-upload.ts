@@ -1,21 +1,35 @@
+import { generateReactHelpers } from "@uploadthing/react";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
+
+export const { useUploadThing, uploadFiles } = generateReactHelpers<OurFileRouter>();
+
 // 파일 업로드 유틸리티 함수들
-export const uploadFile = async (file: File): Promise<{ url: string; fileName: string; fileSize: string }> => {
-  // 실제 구현에서는 서버로 파일을 업로드하고 URL을 받아옵니다
-  // 여기서는 모의 구현으로 처리합니다
+export const uploadFile = async (
+  file: File, 
+  endpoint: "pdfUploader" | "materialUploader" | "expertUploader"
+): Promise<{ url: string; fileName: string; fileSize: string; key: string }> => {
+  try {
+    const response = await uploadFiles(endpoint, {
+      files: [file]
+    });
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const mockUrl = `/uploads/${Date.now()}_${file.name}`
-      const fileSize = formatFileSize(file.size)
+    if (!response || response.length === 0) {
+      throw new Error("파일 업로드에 실패했습니다.");
+    }
 
-      resolve({
-        url: mockUrl,
-        fileName: file.name,
-        fileSize: fileSize,
-      })
-    }, 1000) // 업로드 시뮬레이션을 위한 지연
-  })
-}
+    const uploadedFile = response[0];
+    
+    return {
+      url: uploadedFile.url,
+      fileName: uploadedFile.name,
+      fileSize: formatFileSize(uploadedFile.size),
+      key: uploadedFile.key
+    };
+  } catch (error) {
+    console.error("파일 업로드 오류:", error);
+    throw new Error("파일 업로드에 실패했습니다.");
+  }
+};
 
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return "0 Bytes"

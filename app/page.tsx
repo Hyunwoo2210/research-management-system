@@ -94,7 +94,7 @@ export default function Dashboard() {
               title: paper.title.length > 30 ? paper.title.substring(0, 30) + '...' : paper.title,
               authors: paper.authors.split(',')[0] + (paper.authors.includes(',') ? ' 외' : ''),
               year: paper.year,
-              projectIds: paper.projects.map(p => p.id)
+              projects: paper.projects || []
             }))
         )
 

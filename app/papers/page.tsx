@@ -15,14 +15,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Search, Plus, Edit, Trash2, BookOpen, FileText, Upload, Loader2 } from "lucide-react"
+import { Search, Plus, Edit, Trash2, BookOpen, FileText, Upload, Loader2, Eye, X } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+
+import { uploadFile, validateFile } from "@/lib/file-upload"
 
 export default function PapersPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPaper, setEditingPaper] = useState(null)
+  const [viewingPaper, setViewingPaper] = useState(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [selectedProjectFilter, setSelectedProjectFilter] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
@@ -230,10 +234,16 @@ export default function PapersPage() {
         ) : (
           <div className="space-y-4">
             {filteredPapers.map((paper) => (
-              <Card key={paper.id} className="hover:shadow-md transition-shadow">
+              <Card key={paper.id} className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div className="flex-1">
+                    <div 
+                      className="flex-1"
+                      onClick={() => {
+                        setViewingPaper(paper)
+                        setIsViewDialogOpen(true)
+                      }}
+                    >
                       <CardTitle className="text-xl mb-2">{paper.title}</CardTitle>
                       <CardDescription className="text-base">
                         <span className="font-medium">{paper.authors}</span> ({paper.year})
@@ -252,7 +262,20 @@ export default function PapersPage() {
                     </div>
                     <div className="flex gap-2">
                       {paper.filePath && (
-                        <Button variant="outline" size="sm" onClick={() => window.open(paper.filePath, '_blank')}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            // UploadThing URL인 경우 직접 열기
+                            if (paper.filePath.startsWith('https://uploadthing-prod.s3.us-west-2.amazonaws.com') || 
+                                paper.filePath.startsWith('https://utfs.io')) {
+                              window.open(paper.filePath, '_blank')
+                            } else {
+                              window.open(paper.filePath, '_blank')
+                            }
+                          }}
+                        >
                           <FileText className="w-4 h-4 mr-2" />
                           PDF 보기
                         </Button>
@@ -260,21 +283,34 @@ export default function PapersPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation()
                           setEditingPaper(paper)
                           setIsDialogOpen(true)
                         }}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeletePaper(paper.id)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeletePaper(paper.id)
+                        }}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
                 {paper.notes && (
-                  <CardContent>
+                  <CardContent 
+                    onClick={() => {
+                      setViewingPaper(paper)
+                      setIsViewDialogOpen(true)
+                    }}
+                  >
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <h4 className="font-medium text-sm text-gray-700 mb-2">메모</h4>
                       <p className="text-sm text-gray-600">{paper.notes}</p>
@@ -298,7 +334,132 @@ export default function PapersPage() {
           </div>
         )}
       </main>
+
+      {/* 세부보기 다이얼로그 */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <PaperViewDialog
+          paper={viewingPaper}
+          onEdit={() => {
+            setEditingPaper(viewingPaper)
+            setIsViewDialogOpen(false)
+            setIsDialogOpen(true)
+          }}
+          onDelete={() => {
+            if (viewingPaper) {
+              handleDeletePaper(viewingPaper.id)
+              setIsViewDialogOpen(false)
+            }
+          }}
+          onClose={() => {
+            setIsViewDialogOpen(false)
+            setViewingPaper(null)
+          }}
+        />
+      </Dialog>
     </div>
+  )
+}
+
+function PaperViewDialog({ paper, onEdit, onDelete, onClose }) {
+  if (!paper) return null
+
+  return (
+    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="text-2xl">{paper.title}</DialogTitle>
+        <DialogDescription className="text-lg">
+          <span className="font-medium">{paper.authors}</span> ({paper.year})
+          {paper.publisher && (
+            <>
+              <br />
+              <span className="text-gray-600">{paper.publisher}</span>
+            </>
+          )}
+        </DialogDescription>
+      </DialogHeader>
+      
+      <div className="space-y-6">
+        {/* 프로젝트 연결 정보 */}
+        {paper.projects && paper.projects.length > 0 && (
+          <div>
+            <h4 className="font-semibold text-lg mb-2">연결된 프로젝트</h4>
+            <div className="flex flex-wrap gap-2">
+              {paper.projects.map((project) => (
+                <Badge key={project.id} variant="outline" className="text-sm px-3 py-1">
+                  {project.projectName}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* 파일 정보 */}
+        {paper.fileName && (
+          <div>
+            <h4 className="font-semibold text-lg mb-2">파일 정보</h4>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-gray-500" />
+                <span className="font-medium">{paper.fileName}</span>
+                {paper.fileSize && <span className="text-gray-500">({paper.fileSize})</span>}
+              </div>
+              {paper.filePath && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => {
+                    // UploadThing URL인 경우 직접 열기
+                    if (paper.filePath.startsWith('https://uploadthing-prod.s3.us-west-2.amazonaws.com') || 
+                        paper.filePath.startsWith('https://utfs.io')) {
+                      window.open(paper.filePath, '_blank')
+                    } else {
+                      window.open(paper.filePath, '_blank')
+                    }
+                  }}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  파일 열기
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* 메모 */}
+        {paper.notes && (
+          <div>
+            <h4 className="font-semibold text-lg mb-2">메모</h4>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{paper.notes}</p>
+            </div>
+          </div>
+        )}
+        
+        {/* 메타데이터 */}
+        <div>
+          <h4 className="font-semibold text-lg mb-2">메타데이터</h4>
+          <div className="bg-gray-50 p-4 rounded-lg space-y-1 text-sm">
+            <div><span className="font-medium">등록일:</span> {new Date(paper.createdAt).toLocaleString()}</div>
+            {paper.year && <div><span className="font-medium">출판년도:</span> {paper.year}</div>}
+          </div>
+        </div>
+      </div>
+      
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose}>
+          닫기
+        </Button>
+        <Button variant="outline" onClick={onEdit}>
+          <Edit className="w-4 h-4 mr-2" />
+          수정
+        </Button>
+        <Button variant="destructive" onClick={onDelete}>
+          <Trash2 className="w-4 h-4 mr-2" />
+          삭제
+        </Button>
+      </DialogFooter>
+    </DialogContent>
   )
 }
 
@@ -344,9 +505,57 @@ function PaperDialog({ paper, projects, onSave, onClose }) {
     })
   }
 
-  const handleFileUpload = async () => {
-    // UploadThing 구현 관련 코드
-    // 실제 구현에서는 파일 업로드 로직 추가
+  const handleFileSelect = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setUploadError("")
+
+    // PDF 파일만 허용
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      setUploadError("PDF 파일만 업로드 가능합니다.")
+      return
+    }
+
+    // 파일 유효성 검사
+    const validation = validateFile(file, 20 * 1024 * 1024) // 20MB 제한
+    if (!validation.isValid) {
+      setUploadError(validation.error || "파일 업로드 중 오류가 발생했습니다.")
+      return
+    }
+
+    setIsUploading(true)
+
+    try {
+      const result = await uploadFile(file, "pdfUploader")
+
+      setFileName(result.fileName)
+      setFilePath(result.url)
+      setFileSize(result.fileSize)
+
+      // 제목이 비어있으면 파일명으로 설정
+      if (!title.trim()) {
+        setTitle(file.name.replace(".pdf", ""))
+      }
+    } catch (error) {
+      console.error("파일 업로드 오류:", error)
+      setUploadError("파일 업로드 중 오류가 발생했습니다.")
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleRemoveFile = () => {
+    setFileName("")
+    setFilePath("")
+    setFileSize("")
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
   }
 
   return (
@@ -415,16 +624,60 @@ function PaperDialog({ paper, projects, onSave, onClose }) {
         </div>
 
         <div>
-          <Label htmlFor="filePath">PDF 파일 경로</Label>
-          <Input
-            id="filePath"
-            value={filePath}
-            onChange={(e) => setFilePath(e.target.value)}
-            placeholder="파일 경로 또는 URL"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            파일 업로드 기능이 구현되면 자동으로 채워집니다.
-          </p>
+          <Label htmlFor="file">PDF 파일</Label>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleFileSelect}
+                disabled={isUploading}
+                className="flex-1 bg-transparent"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    업로드 중...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    PDF 업로드
+                  </>
+                )}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileChange}
+                className="hidden"
+                accept=".pdf,application/pdf"
+              />
+            </div>
+
+            {uploadError && <div className="text-sm text-red-600 bg-red-50 p-2 rounded">{uploadError}</div>}
+
+            {fileName && (
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-red-500" />
+                  <div>
+                    <div className="font-medium text-sm">{fileName}</div>
+                    {fileSize && <div className="text-xs text-gray-500">{fileSize}</div>}
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRemoveFile}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div>

@@ -5,34 +5,35 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const papers = await prisma.paper.findMany({
+    const experts = await prisma.expert.findMany({
       orderBy: { createdAt: "desc" },
       include: {
         projects: true
       }
     });
-    return NextResponse.json(papers);
+    return NextResponse.json(experts);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch papers" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch experts" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, authors, year, publisher, notes, filePath, fileName, fileSize, projectIds } = body;
+    const { name, affiliation, expertise, email, phone, notes, filePath, fileName, fileSize, projectIds } = body;
     
     // 필수 필드 확인
-    if (!title || !authors) {
-      return NextResponse.json({ error: "Title and authors are required" }, { status: 400 });
+    if (!name) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
     
-    const paper = await prisma.paper.create({
+    const expert = await prisma.expert.create({
       data: {
-        title,
-        authors,
-        year: year || new Date().getFullYear(),
-        publisher: publisher || null,
+        name,
+        affiliation: affiliation || null,
+        expertise: expertise || null,
+        email: email || null,
+        phone: phone || null,
         notes: notes || null,
         filePath: filePath || null,
         fileName: fileName || null,
@@ -46,12 +47,12 @@ export async function POST(request: Request) {
       }
     });
     
-    return NextResponse.json(paper);
+    return NextResponse.json(expert);
   } catch (error) {
-    console.error("Create paper error:", error);
+    console.error("Create expert error:", error);
     return NextResponse.json({ 
-      error: "Failed to create paper", 
+      error: "Failed to create expert", 
       details: error instanceof Error ? error.message : "Unknown error" 
     }, { status: 500 });
   }
-} 
+}
