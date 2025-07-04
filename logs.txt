@@ -153,3 +153,4 @@
   syscall: 'open',
   path: 'C:\\Users\\estoc\\cursor_project\\research_management_0702\\final_reserch_manage\\.next\\static\\chunks\\app\\layout.js'
 }
+^C^C
