@@ -247,7 +247,7 @@ function PaperDetailDialog({ paper, onClose, onEdit, onDelete }) {
                     <Download className="w-4 h-4 mr-2" />
                     다운로드
                   </Button>
-                  {paper.filePath.match(/\.(pdf|txt|doc|docx)$/i) && (
+                  {paper.filePath.match(/\.(pdf|txt|doc|docx|hwp|hwpx|xls|xlsx|ppt|pptx)$/i) && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -1730,28 +1730,29 @@ export default function SchedulePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="py-4 sm:py-6">
+            <div className="mb-4 sm:mb-0">
               <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm mb-2 block">
                 ← 대시보드로 돌아가기
               </Link>
-              <h1 className="text-3xl font-bold text-gray-900">프로젝트/일정 관리</h1>
-              <p className="text-gray-600 mt-1">연구 프로젝트와 일정을 체계적으로 관리하세요</p>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">프로젝트/일정 관리</h1>
+              <p className="text-gray-600 mt-1 text-sm sm:text-base">연구 프로젝트와 일정을 체계적으로 관리하세요</p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setShowNotifications(!showNotifications)} className="relative">
-                <Bell className="w-4 h-4 mr-2" />
-                알림
+            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-start mt-4">
+              <Button variant="outline" onClick={() => setShowNotifications(!showNotifications)} className="relative text-xs sm:text-sm px-2 sm:px-4">
+                <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">알림</span>
                 {notifications.length > 0 && (
-                  <Badge className="absolute -top-2 -right-2 px-1 min-w-[1.25rem] h-5">{notifications.length}</Badge>
+                  <Badge className="absolute -top-2 -right-2 px-1 min-w-[1.25rem] h-5 text-xs">{notifications.length}</Badge>
                 )}
               </Button>
               <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" onClick={() => setEditingTask(null)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    작업 추가
+                  <Button variant="outline" onClick={() => setEditingTask(null)} className="text-xs sm:text-sm px-2 sm:px-4">
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">작업 추가</span>
+                    <span className="sm:hidden">작업</span>
                   </Button>
                 </DialogTrigger>
                 <TaskDialog
@@ -1768,9 +1769,10 @@ export default function SchedulePage() {
               </Dialog>
               <Dialog open={isProjectDialogOpen} onOpenChange={setIsProjectDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button onClick={() => setEditingProject(null)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    프로젝트 추가
+                  <Button onClick={() => setEditingProject(null)} className="text-xs sm:text-sm px-2 sm:px-4">
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">프로젝트 추가</span>
+                    <span className="sm:hidden">프로젝트</span>
                   </Button>
                 </DialogTrigger>
                 <ProjectDialog
@@ -1789,7 +1791,7 @@ export default function SchedulePage() {
 
       {showNotifications && (
         <div className="bg-white border-b shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
             <NotificationPanelComponent
               notifications={notifications}
               onClose={() => setShowNotifications(false)}
@@ -1801,8 +1803,8 @@ export default function SchedulePage() {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="space-y-4 sm:space-y-6">
           {projects.map((project) => {
             const projectTasks = getTasksByProject(project.id)
             const completedTasks = projectTasks.filter((task) => task.status === "completed").length
@@ -1810,8 +1812,8 @@ export default function SchedulePage() {
 
             return (
               <Card key={project.id}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
+                <CardHeader className="pb-3 sm:pb-4">
+                  <div className="space-y-3 sm:space-y-0 sm:flex sm:justify-between sm:items-start">
                     <div 
                       className="cursor-pointer flex-1"
                       onClick={() => {
@@ -1819,9 +1821,9 @@ export default function SchedulePage() {
                         setIsProjectViewDialogOpen(true)
                       }}
                     >
-                      <CardTitle className="text-xl">{project.projectName}</CardTitle>
-                      <CardDescription className="mt-1">{project.description}</CardDescription>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                      <CardTitle className="text-lg sm:text-xl">{project.projectName}</CardTitle>
+                      <CardDescription className="mt-1 text-sm sm:text-base">{project.description}</CardDescription>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-gray-500">
                         <span>생성일: {project.createdAt}</span>
                         <span>
                           진행률: {totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0}% (
@@ -1829,7 +1831,7 @@ export default function SchedulePage() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 justify-end sm:justify-start">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1838,8 +1840,9 @@ export default function SchedulePage() {
                           setEditingProject(project)
                           setIsProjectDialogOpen(true)
                         }}
+                        className="p-2"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                       </Button>
                       <Button 
                         variant="ghost" 
@@ -1848,72 +1851,74 @@ export default function SchedulePage() {
                           e.stopPropagation()
                           handleDeleteProject(project.id)
                         }}
+                        className="p-2"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   {projectTasks.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {projectTasks.map((task) => (
-                        <div key={task.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-3 flex-1">
-                            <Button variant="ghost" size="sm" onClick={() => toggleTaskStatus(task.id)} className="p-1">
-                              {task.status === "completed" ? (
-                                <CheckCircle className="w-5 h-5 text-green-600" />
-                              ) : (
-                                <div className="w-5 h-5 border-2 border-gray-300 rounded-full" />
-                              )}
-                            </Button>
-                            <div 
-                              className="flex-1 cursor-pointer"
-                              onClick={() => {
-                                setViewingTask(task)
-                                setIsTaskViewDialogOpen(true)
-                              }}
+                        <div key={task.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                          <Button variant="ghost" size="sm" onClick={() => toggleTaskStatus(task.id)} className="p-1 flex-shrink-0 mt-1">
+                            {task.status === "completed" ? (
+                              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                            ) : (
+                              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-gray-300 rounded-full" />
+                            )}
+                          </Button>
+                          <div 
+                            className="flex-1 cursor-pointer min-w-0"
+                            onClick={() => {
+                              setViewingTask(task)
+                              setIsTaskViewDialogOpen(true)
+                            }}
+                          >
+                            <h4
+                              className={`font-medium text-sm sm:text-base break-words ${task.status === "completed" ? "line-through text-gray-500" : ""}`}
                             >
-                              <h4
-                                className={`font-medium ${task.status === "completed" ? "line-through text-gray-500" : ""}`}
-                              >
-                                {task.taskName}
-                              </h4>
-                              <p className="text-sm text-gray-600">{task.description}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge className={getTaskStatusColor(task.status)}>
-                                  {getTaskStatusText(task.status)}
-                                </Badge>
-                                {task.notifications && (
-                                  <div className="flex items-center text-xs text-blue-600">
-                                    <Bell className="w-3 h-3 mr-1" />
-                                    <span>
-                                      {task.notificationTiming === "1day"
-                                        ? "1일전"
-                                        : task.notificationTiming === "3days"
-                                          ? "3일전"
-                                          : task.notificationTiming === "1week"
-                                            ? "1주일전"
-                                            : task.notificationTiming === "1month"
-                                              ? "1개월전"
-                                              : "알림"}
-                                    </span>
-                                  </div>
-                                )}
-                                <div
-                                  className={`flex items-center text-xs ${isOverdue(task.dueDate) && task.status !== "completed" ? "text-red-600" : "text-gray-500"}`}
-                                >
-                                  {isOverdue(task.dueDate) && task.status !== "completed" ? (
-                                    <AlertCircle className="w-3 h-3 mr-1" />
-                                  ) : (
-                                    <Clock className="w-3 h-3 mr-1" />
-                                  )}
-                                  {task.dueDate}
+                              {task.taskName}
+                            </h4>
+                            {task.description && (
+                              <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{task.description}</p>
+                            )}
+                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-2">
+                              <Badge className={`${getTaskStatusColor(task.status)} text-xs`}>
+                                {getTaskStatusText(task.status)}
+                              </Badge>
+                              {task.notifications && (
+                                <div className="flex items-center text-xs text-blue-600">
+                                  <Bell className="w-3 h-3 mr-1" />
+                                  <span className="hidden sm:inline">
+                                    {task.notificationTiming === "1day"
+                                      ? "1일전"
+                                      : task.notificationTiming === "3days"
+                                        ? "3일전"
+                                        : task.notificationTiming === "1week"
+                                          ? "1주일전"
+                                          : task.notificationTiming === "1month"
+                                            ? "1개월전"
+                                            : "알림"}
+                                  </span>
+                                  <span className="sm:hidden">🔔</span>
                                 </div>
+                              )}
+                              <div
+                                className={`flex items-center text-xs ${isOverdue(task.dueDate) && task.status !== "completed" ? "text-red-600" : "text-gray-500"}`}
+                              >
+                                {isOverdue(task.dueDate) && task.status !== "completed" ? (
+                                  <AlertCircle className="w-3 h-3 mr-1" />
+                                ) : (
+                                  <Clock className="w-3 h-3 mr-1" />
+                                )}
+                                <span className="whitespace-nowrap">{task.dueDate}</span>
                               </div>
                             </div>
                           </div>
-                          <div className="flex gap-1">
+                          <div className="flex flex-col sm:flex-row gap-1 flex-shrink-0">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -1922,8 +1927,9 @@ export default function SchedulePage() {
                                 setEditingTask(task)
                                 setIsTaskDialogOpen(true)
                               }}
+                              className="p-2"
                             >
-                              <Edit className="w-4 h-4" />
+                              <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                             <Button 
                               variant="ghost" 
@@ -1932,8 +1938,9 @@ export default function SchedulePage() {
                                 e.stopPropagation()
                                 handleDeleteTask(task.id)
                               }}
+                              className="p-2"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                           </div>
                         </div>
@@ -1958,9 +1965,9 @@ export default function SchedulePage() {
                     </div>
                   )}
                   {/* 관련 자료 섹션 추가 */}
-                  <div className="mt-6 pt-4 border-t">
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium text-gray-900">관련 자료</h4>
+                  <div className="mt-4 sm:mt-6 pt-4 border-t">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 mb-3">
+                      <h4 className="font-medium text-gray-900 text-sm sm:text-base">관련 자료</h4>
                       <Button
                         variant="outline"
                         size="sm"
@@ -1969,9 +1976,11 @@ export default function SchedulePage() {
                           setEditingMaterial(null)
                           setIsMaterialDialogOpen(true)
                         }}
+                        className="text-xs sm:text-sm px-2 sm:px-4 self-end sm:self-auto"
                       >
-                        <Plus className="w-4 h-4 mr-2" />
-                        자료 추가
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">자료 추가</span>
+                        <span className="sm:hidden">추가</span>
                       </Button>
                     </div>
                     {getProjectMaterials(project.id).length > 0 ? (
@@ -2071,9 +2080,9 @@ export default function SchedulePage() {
                     )}
                   </div>
                   {/* 기존 작업 목록 다음에 참고문헌 섹션 추가 */}
-                  <div className="mt-6 pt-4 border-t">
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium text-gray-900">참고문헌</h4>
+                  <div className="mt-4 sm:mt-6 pt-4 border-t">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 mb-3">
+                      <h4 className="font-medium text-gray-900 text-sm sm:text-base">참고문헌</h4>
                       <Button
                         variant="outline"
                         size="sm"
@@ -2081,9 +2090,11 @@ export default function SchedulePage() {
                           setSelectedProjectForPaper(project.id)
                           setIsPaperDialogOpen(true)
                         }}
+                        className="text-xs sm:text-sm px-2 sm:px-4 self-end sm:self-auto"
                       >
-                        <Plus className="w-4 h-4 mr-2" />
-                        문헌 추가
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">문헌 추가</span>
+                        <span className="sm:hidden">추가</span>
                       </Button>
                     </div>
                     {getProjectPapers(project.id).length > 0 ? (
@@ -2093,23 +2104,24 @@ export default function SchedulePage() {
                           .map((paper) => (
                             <div
                               key={paper.id}
-                              className="flex items-center justify-between p-2 bg-blue-50 rounded text-sm cursor-pointer hover:bg-blue-100 transition-colors"
+                              className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-blue-50 rounded text-xs sm:text-sm cursor-pointer hover:bg-blue-100 transition-colors"
                               onClick={() => {
                                 setViewingPaper(paper)
                                 setIsPaperDetailDialogOpen(true)
                               }}
                             >
-                              <div>
-                                <span className="font-medium">{paper.title}</span>
-                                <span className="text-gray-600 ml-2">({paper.year})</span>
+                              <div className="flex-1 min-w-0">
+                                <span className="font-medium block truncate">{paper.title}</span>
+                                <span className="text-gray-600">({paper.year})</span>
                                 {paper.fileName && (
-                                  <div className="text-xs text-blue-600 mt-1 flex items-center gap-1">
-                                    <FileText className="w-3 h-3" />
-                                    {paper.fileName} {paper.fileSize && `(${paper.fileSize})`}
+                                  <div className="text-blue-600 mt-1 flex items-center gap-1">
+                                    <FileText className="w-3 h-3 flex-shrink-0" />
+                                    <span className="truncate">{paper.fileName}</span>
+                                    {paper.fileSize && <span className="flex-shrink-0">({paper.fileSize})</span>}
                                   </div>
                                 )}
                               </div>
-                              <div className="flex gap-1">
+                              <div className="flex flex-col sm:flex-row gap-1 flex-shrink-0">
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -2118,6 +2130,7 @@ export default function SchedulePage() {
                                     setViewingPaper(paper)
                                     setIsPaperDetailDialogOpen(true)
                                   }}
+                                  className="p-1 sm:p-2"
                                 >
                                   <Eye className="w-3 h-3" />
                                 </Button>
@@ -2128,6 +2141,7 @@ export default function SchedulePage() {
                                     e.stopPropagation()
                                     handleRemovePaperFromProject(paper.id, project.id)
                                   }}
+                                  className="p-1 sm:p-2"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </Button>
@@ -2135,17 +2149,17 @@ export default function SchedulePage() {
                             </div>
                           ))}
                         {getProjectPapers(project.id).length > 3 && (
-                          <p className="text-xs text-gray-500">+{getProjectPapers(project.id).length - 3}개 더 보기</p>
+                          <p className="text-xs text-gray-500 text-center">+{getProjectPapers(project.id).length - 3}개 더 보기</p>
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">아직 추가된 참고문헌이 없습니다.</p>
+                      <p className="text-xs sm:text-sm text-gray-500">아직 추가된 참고문헌이 없습니다.</p>
                     )}
                   </div>
                   {/* 참고문헌 섹션 다음에 전문가 섹션 추가 */}
-                  <div className="mt-6 pt-4 border-t">
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium text-gray-900">전문가 리스트</h4>
+                  <div className="mt-4 sm:mt-6 pt-4 border-t">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 mb-3">
+                      <h4 className="font-medium text-gray-900 text-sm sm:text-base">전문가 리스트</h4>
                       <Button
                         variant="outline"
                         size="sm"
@@ -2154,58 +2168,60 @@ export default function SchedulePage() {
                           setEditingExpert(null)
                           setIsExpertDialogOpen(true)
                         }}
+                        className="text-xs sm:text-sm px-2 sm:px-4 self-end sm:self-auto"
                       >
-                        <Plus className="w-4 h-4 mr-2" />
-                        전문가 추가
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">전문가 추가</span>
+                        <span className="sm:hidden">추가</span>
                       </Button>
                     </div>
                     {getProjectExperts(project.id).length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         {getProjectExperts(project.id)
                           .slice(0, 3)
                           .map((expert) => (
                             <div
                               key={expert.id}
-                              className="flex items-start justify-between p-3 bg-green-50 rounded-lg border border-green-200 cursor-pointer hover:bg-green-100 transition-colors"
+                              className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-green-50 rounded-lg border border-green-200 cursor-pointer hover:bg-green-100 transition-colors"
                               onClick={() => {
                                 setViewingExpert(expert)
                                 setIsExpertDetailDialogOpen(true)
                               }}
                             >
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-medium text-green-900">{expert.name}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                                  <span className="font-medium text-green-900 text-sm sm:text-base">{expert.name}</span>
                                   {expert.affiliation && (
-                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded self-start">
                                       {expert.affiliation}
                                     </span>
                                   )}
                                 </div>
-                                {expert.expertise && <p className="text-sm text-green-700 mb-1">{expert.expertise}</p>}
-                                <div className="flex items-center gap-3 text-xs text-green-600">
+                                {expert.expertise && <p className="text-xs sm:text-sm text-green-700 mb-1 break-words">{expert.expertise}</p>}
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-green-600">
                                   {expert.email && (
-                                    <div className="flex items-center gap-1">
-                                      <Mail className="w-3 h-3" />
-                                      <span>{expert.email}</span>
+                                    <div className="flex items-center gap-1 min-w-0">
+                                      <Mail className="w-3 h-3 flex-shrink-0" />
+                                      <span className="truncate">{expert.email}</span>
                                     </div>
                                   )}
                                   {expert.phone && (
                                     <div className="flex items-center gap-1">
-                                      <Phone className="w-3 h-3" />
+                                      <Phone className="w-3 h-3 flex-shrink-0" />
                                       <span>{expert.phone}</span>
                                     </div>
                                   )}
                                   {expert.fileName && (
-                                    <div className="flex items-center gap-1">
-                                      <FileText className="w-3 h-3" />
-                                      <span>
+                                    <div className="flex items-center gap-1 min-w-0">
+                                      <FileText className="w-3 h-3 flex-shrink-0" />
+                                      <span className="truncate">
                                         {expert.fileName} {expert.fileSize && `(${expert.fileSize})`}
                                       </span>
                                     </div>
                                   )}
                                 </div>
                               </div>
-                              <div className="flex gap-1">
+                              <div className="flex flex-col sm:flex-row gap-1 flex-shrink-0">
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -2214,6 +2230,7 @@ export default function SchedulePage() {
                                     setViewingExpert(expert)
                                     setIsExpertDetailDialogOpen(true)
                                   }}
+                                  className="p-1 sm:p-2"
                                 >
                                   <Eye className="w-3 h-3" />
                                 </Button>
@@ -2226,6 +2243,7 @@ export default function SchedulePage() {
                                     setSelectedProjectForExpert(project.id)
                                     setIsExpertDialogOpen(true)
                                   }}
+                                  className="p-1 sm:p-2"
                                 >
                                   <Edit className="w-3 h-3" />
                                 </Button>
@@ -2236,6 +2254,7 @@ export default function SchedulePage() {
                                     e.stopPropagation()
                                     handleRemoveExpertFromProject(expert.id, project.id)
                                   }}
+                                  className="p-1 sm:p-2"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </Button>
@@ -2243,11 +2262,11 @@ export default function SchedulePage() {
                             </div>
                           ))}
                         {getProjectExperts(project.id).length > 3 && (
-                          <p className="text-xs text-gray-500">+{getProjectExperts(project.id).length - 3}명 더 보기</p>
+                          <p className="text-xs text-gray-500 text-center">+{getProjectExperts(project.id).length - 3}명 더 보기</p>
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">아직 추가된 전문가가 없습니다.</p>
+                      <p className="text-xs sm:text-sm text-gray-500">아직 추가된 전문가가 없습니다.</p>
                     )}
                   </div>
                 </CardContent>
@@ -2257,17 +2276,60 @@ export default function SchedulePage() {
         </div>
 
         {projects.length === 0 && (
-          <div className="text-center py-12">
-            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">프로젝트가 없습니다</h3>
-            <p className="text-gray-600 mb-4">첫 번째 연구 프로젝트를 시작해보세요.</p>
-            <Button onClick={() => setIsProjectDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
+          <div className="text-center py-8 sm:py-12 px-4">
+            <Calendar className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">프로젝트가 없습니다</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-4">첫 번째 연구 프로젝트를 시작해보세요.</p>
+            <Button onClick={() => setIsProjectDialogOpen(true)} className="text-sm sm:text-base px-4 sm:px-6">
+              <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               프로젝트 추가
             </Button>
           </div>
         )}
       </main>
+
+      {/* 푸터 */}
+      <footer className="bg-gray-900 text-white mt-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {/* 시스템 정보 */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">언론재단 이박사의 연구관리 시스템</h3>
+              <p className="text-gray-300 text-sm">
+                언론 분야 연구를 체계적으로 관리하는 통합 플랫폼입니다.
+              </p>
+            </div>
+
+            {/* 기술 스택 */}
+            <div>
+              <h4 className="text-md font-semibold mb-3">기술 스택</h4>
+              <div className="space-y-1 text-sm text-gray-300">
+                <div>• Frontend: Next.js, React, TypeScript</div>
+                <div>• UI: Tailwind CSS, Radix UI</div>
+                <div>• Database: PostgreSQL, Prisma ORM</div>
+                <div>• Storage: UploadThing</div>
+              </div>
+            </div>
+
+            {/* 개발 정보 */}
+            <div>
+              <h4 className="text-md font-semibold mb-3">개발 정보</h4>
+              <div className="space-y-1 text-sm text-gray-300">
+                <div>• 개발자: 이현우</div>
+                <div>• 제작연도: 2025</div>
+                <div>• 버전: 1.0.0</div>
+                <div>• 최종 업데이트: {new Date().toLocaleDateString('ko-KR')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-700 mt-6 pt-6 text-center">
+            <p className="text-sm text-gray-400">
+              © 2025 언론재단 이박사의 연구관리 시스템. Developed by 이현우. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
 
       {/* 다이얼로그들 */}
       <Dialog open={isPaperDialogOpen} onOpenChange={setIsPaperDialogOpen}>

@@ -73,7 +73,7 @@ export function ExpertDialog({ expert, onSave, onClose }: ExpertDialogProps) {
     setUploadError("")
 
     // 파일 유효성 검사
-    const validation = validateFile(file, 10 * 1024 * 1024) // 10MB 제한
+    const validation = validateFile(file, 20 * 1024 * 1024) // 20MB 제한
     if (!validation.isValid) {
       setUploadError(validation.error || "파일 업로드 중 오류가 발생했습니다.")
       return

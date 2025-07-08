@@ -64,11 +64,11 @@ export function PaperDialog({ onSave, onClose }: PaperDialogProps) {
 
     setUploadError("")
 
-    // PDF 파일만 허용 (선택사항)
-    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
-      setUploadError("PDF 파일만 업로드 가능합니다.")
-      return
-    }
+    // 파일 타입 제한 제거 (모든 파일 허용)
+    // if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+    //   setUploadError("PDF 파일만 업로드 가능합니다.")
+    //   return
+    // }
 
     // 파일 유효성 검사
     const validation = validateFile(file, 20 * 1024 * 1024) // 20MB 제한
@@ -80,15 +80,16 @@ export function PaperDialog({ onSave, onClose }: PaperDialogProps) {
     setIsUploading(true)
 
     try {
-      const result = await uploadFile(file)
+      const result = await uploadFile(file, "pdfUploader")
 
       setFileName(result.fileName)
       setFilePath(result.url)
       setFileSize(result.fileSize)
 
-      // 제목이 비어있으면 파일명으로 설정
+      // 제목이 비어있으면 파일명으로 설정 (확장자 제거)
       if (!title.trim()) {
-        setTitle(file.name.replace(".pdf", ""))
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "")
+        setTitle(nameWithoutExt)
       }
     } catch (error) {
       setUploadError("파일 업로드 중 오류가 발생했습니다.")
@@ -148,7 +149,7 @@ export function PaperDialog({ onSave, onClose }: PaperDialogProps) {
         </div>
 
         <div>
-          <Label htmlFor="file">PDF 파일</Label>
+          <Label htmlFor="file">파일 업로드</Label>
           <div className="space-y-2">
             <div className="flex gap-2">
               <Button
@@ -166,7 +167,7 @@ export function PaperDialog({ onSave, onClose }: PaperDialogProps) {
                 ) : (
                   <>
                     <Upload className="w-4 h-4 mr-2" />
-                    PDF 업로드
+                    파일 업로드
                   </>
                 )}
               </Button>
@@ -175,7 +176,7 @@ export function PaperDialog({ onSave, onClose }: PaperDialogProps) {
                 type="file"
                 onChange={handleFileChange}
                 className="hidden"
-                accept=".pdf,application/pdf"
+                accept="*/*"
               />
             </div>
 

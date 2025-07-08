@@ -3,10 +3,9 @@ import { createUploadthing } from "uploadthing/next";
 const f = createUploadthing();
 
 export const ourFileRouter = {
-  // 논문 PDF 업로더
+  // 논문 업로더 (모든 파일 타입 지원)
   pdfUploader: f({ 
-    pdf: { maxFileSize: "20MB", maxFileCount: 1 },
-    "application/pdf": { maxFileSize: "20MB", maxFileCount: 1 }
+    blob: { maxFileSize: "50MB", maxFileCount: 1 }
   })
     .middleware(async () => {
       return { 
@@ -15,7 +14,7 @@ export const ourFileRouter = {
       };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("PDF 업로드 완료:", file);
+      console.log("논문 파일 업로드 완료:", file);
       return { 
         uploadedBy: metadata.userId, 
         url: file.url,
@@ -25,17 +24,9 @@ export const ourFileRouter = {
       };
     }),
     
-  // 자료 업로더 (이미지, 문서, 오디오, 비디오)
+  // 자료 업로더 (모든 파일 타입 지원)
   materialUploader: f({
-    "image/*": { maxFileSize: "10MB", maxFileCount: 1 },
-    "application/pdf": { maxFileSize: "20MB", maxFileCount: 1 },
-    "application/msword": { maxFileSize: "10MB", maxFileCount: 1 },
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { maxFileSize: "10MB", maxFileCount: 1 },
-    "text/plain": { maxFileSize: "5MB", maxFileCount: 1 },
-    "audio/*": { maxFileSize: "50MB", maxFileCount: 1 },
-    "video/*": { maxFileSize: "100MB", maxFileCount: 1 },
-    "application/zip": { maxFileSize: "50MB", maxFileCount: 1 },
-    "application/x-rar-compressed": { maxFileSize: "50MB", maxFileCount: 1 }
+    blob: { maxFileSize: "50MB", maxFileCount: 1 }
   })
     .middleware(async () => {
       return { 
@@ -56,11 +47,7 @@ export const ourFileRouter = {
 
   // 전문가 관련 파일 업로더
   expertUploader: f({
-    "image/*": { maxFileSize: "5MB", maxFileCount: 1 },
-    "application/pdf": { maxFileSize: "10MB", maxFileCount: 1 },
-    "application/msword": { maxFileSize: "10MB", maxFileCount: 1 },
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { maxFileSize: "10MB", maxFileCount: 1 },
-    "text/plain": { maxFileSize: "5MB", maxFileCount: 1 }
+    blob: { maxFileSize: "20MB", maxFileCount: 1 }
   })
     .middleware(async () => {
       return { 

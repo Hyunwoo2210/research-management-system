@@ -143,45 +143,55 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">연구 관리 대시보드</h1>
-              <p className="text-gray-600 mt-1">언론 분야 연구를 체계적으로 관리하세요</p>
+          <div className="py-4 sm:py-6">
+            {/* 제목 섹션 */}
+            <div className="text-center lg:text-left mb-4 lg:mb-6">
+              <h1 className="text-2xl sm:text-3xl lg:text-3xl font-bold text-gray-900">
+                언론재단 이박사의 연구관리 시스템
+              </h1>
+              <p className="text-gray-600 mt-1 text-sm sm:text-base">
+                언론 분야 연구를 체계적으로 관리하세요
+              </p>
             </div>
-            <nav className="flex space-x-4">
+            
+            {/* 네비게이션 섹션 */}
+            <nav className="flex flex-wrap justify-center lg:justify-start gap-2 sm:gap-3">
               <Link href="/notes">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  노트
+                <Button variant="ghost" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2">
+                  <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">노트</span>
                 </Button>
               </Link>
               <Link href="/papers">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  논문
+                <Button variant="ghost" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2">
+                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">논문</span>
                 </Button>
               </Link>
               <Link href="/schedule">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  프로젝트/일정
+                <Button variant="ghost" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">프로젝트</span>
                 </Button>
               </Link>
               <Link href="/achievements">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4" />
-                  성과
+                <Button variant="ghost" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2">
+                  <Trophy className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">성과</span>
                 </Button>
               </Link>
               <Link href="/settings">
-                <Button variant="ghost">설정</Button>
+                <Button variant="ghost" className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2">
+                  <span className="hidden sm:inline">설정</span>
+                  <span className="sm:hidden">⚙️</span>
+                </Button>
               </Link>
             </nav>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         {error && (
           <div className="bg-red-50 text-red-700 p-4 rounded-md mb-6">
             {error}
@@ -195,49 +205,49 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">총 노트</CardTitle>
-                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs sm:text-sm font-medium">총 노트</CardTitle>
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalNotes}</div>
+                  <div className="text-xl sm:text-2xl font-bold">{stats.totalNotes}</div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">총 논문</CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs sm:text-sm font-medium">총 논문</CardTitle>
+                  <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalPapers}</div>
+                  <div className="text-xl sm:text-2xl font-bold">{stats.totalPapers}</div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">활성 프로젝트</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs sm:text-sm font-medium">활성 프로젝트</CardTitle>
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.activeProjects}</div>
+                  <div className="text-xl sm:text-2xl font-bold">{stats.activeProjects}</div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">총 성과</CardTitle>
-                  <Trophy className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs sm:text-sm font-medium">총 성과</CardTitle>
+                  <Trophy className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalAchievements}</div>
+                  <div className="text-xl sm:text-2xl font-bold">{stats.totalAchievements}</div>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
@@ -317,7 +327,7 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
@@ -389,7 +399,7 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
@@ -428,6 +438,49 @@ export default function Dashboard() {
           </>
         )}
       </main>
+
+      {/* 푸터 */}
+      <footer className="bg-gray-900 text-white mt-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {/* 시스템 정보 */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">언론재단 이박사의 연구관리 시스템</h3>
+              <p className="text-gray-300 text-sm">
+                언론 분야 연구를 체계적으로 관리하는 통합 플랫폼입니다.
+              </p>
+            </div>
+
+            {/* 기술 스택 */}
+            <div>
+              <h4 className="text-md font-semibold mb-3">기술 스택</h4>
+              <div className="space-y-1 text-sm text-gray-300">
+                <div>• Frontend: Next.js, React, TypeScript</div>
+                <div>• UI: Tailwind CSS, Radix UI</div>
+                <div>• Database: PostgreSQL, Prisma ORM</div>
+                <div>• Storage: UploadThing</div>
+              </div>
+            </div>
+
+            {/* 개발 정보 */}
+            <div>
+              <h4 className="text-md font-semibold mb-3">개발 정보</h4>
+              <div className="space-y-1 text-sm text-gray-300">
+                <div>• 개발자: 이현우</div>
+                <div>• 제작연도: 2025</div>
+                <div>• 버전: 1.0.0</div>
+                <div>• 최종 업데이트: {new Date().toLocaleDateString('ko-KR')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-700 mt-6 pt-6 text-center">
+            <p className="text-sm text-gray-400">
+              © 2025 언론재단 이박사의 연구관리 시스템. Developed by 이현우. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

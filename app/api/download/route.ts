@@ -35,6 +35,8 @@ export async function GET(request: NextRequest) {
       ".pdf": "application/pdf",
       ".doc": "application/msword",
       ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ".hwp": "application/vnd.hancom.hwp",
+      ".hwpx": "application/vnd.hancom.hwpx",
       ".txt": "text/plain",
       ".jpg": "image/jpeg",
       ".jpeg": "image/jpeg",

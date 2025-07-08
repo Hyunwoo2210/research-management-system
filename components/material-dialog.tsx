@@ -80,8 +80,8 @@ export function MaterialDialog({ material, onSave, onClose }: MaterialDialogProp
 
     setUploadError("")
 
-    // 파일 유효성 검사
-    const validation = validateFile(file)
+    // 파일 유효성 검사 (더 관대하게)
+    const validation = validateFile(file, 50 * 1024 * 1024) // 50MB 제한으로 증가
     if (!validation.isValid) {
       setUploadError(validation.error || "파일 업로드 중 오류가 발생했습니다.")
       return

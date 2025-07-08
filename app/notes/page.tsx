@@ -297,6 +297,49 @@ export default function NotesPage() {
         )}
       </main>
 
+      {/* 푸터 */}
+      <footer className="bg-gray-900 text-white mt-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {/* 시스템 정보 */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">언론재단 이박사의 연구관리 시스템</h3>
+              <p className="text-gray-300 text-sm">
+                언론 분야 연구를 체계적으로 관리하는 통합 플랫폼입니다.
+              </p>
+            </div>
+
+            {/* 기술 스택 */}
+            <div>
+              <h4 className="text-md font-semibold mb-3">기술 스택</h4>
+              <div className="space-y-1 text-sm text-gray-300">
+                <div>• Frontend: Next.js, React, TypeScript</div>
+                <div>• UI: Tailwind CSS, Radix UI</div>
+                <div>• Database: PostgreSQL, Prisma ORM</div>
+                <div>• Storage: UploadThing</div>
+              </div>
+            </div>
+
+            {/* 개발 정보 */}
+            <div>
+              <h4 className="text-md font-semibold mb-3">개발 정보</h4>
+              <div className="space-y-1 text-sm text-gray-300">
+                <div>• 개발자: 이현우</div>
+                <div>• 제작연도: 2025</div>
+                <div>• 버전: 1.0.0</div>
+                <div>• 최종 업데이트: {new Date().toLocaleDateString('ko-KR')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-700 mt-6 pt-6 text-center">
+            <p className="text-sm text-gray-400">
+              © 2025 언론재단 이박사의 연구관리 시스템. Developed by 이현우. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+
       {/* 세부보기 다이얼로그 */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <NoteViewDialog

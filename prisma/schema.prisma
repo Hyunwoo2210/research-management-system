@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 데이터 모델 정의
 model Note {
   id        Int      @id @default(autoincrement())
   title     String
@@ -24,17 +17,17 @@ model Note {
 }
 
 model Paper {
-  id          Int       @id @default(autoincrement())
-  title       String
-  authors     String
-  year        Int
-  publisher   String?
-  notes       String?
-  filePath    String?
-  fileName    String?
-  fileSize    String?
-  createdAt   DateTime  @default(now())
-  projects    Project[] @relation("PaperToProject")
+  id        Int       @id @default(autoincrement())
+  title     String
+  authors   String
+  year      Int
+  publisher String?
+  notes     String?
+  filePath  String?
+  fileName  String?
+  fileSize  String?
+  createdAt DateTime  @default(now())
+  projects  Project[] @relation("PaperToProject")
 }
 
 model Project {
@@ -43,9 +36,9 @@ model Project {
   description String?
   createdAt   DateTime   @default(now())
   tasks       Task[]
-  papers      Paper[]    @relation("PaperToProject")
   experts     Expert[]   @relation("ExpertToProject")
   materials   Material[] @relation("MaterialToProject")
+  papers      Paper[]    @relation("PaperToProject")
 }
 
 model Task {
@@ -57,8 +50,8 @@ model Task {
   createdAt          DateTime  @default(now())
   notifications      Boolean   @default(false)
   notificationTiming String?
-  project            Project   @relation(fields: [projectId], references: [id])
   projectId          Int
+  project            Project   @relation(fields: [projectId], references: [id])
 }
 
 model Achievement {

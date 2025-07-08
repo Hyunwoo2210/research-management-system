@@ -1,85 +1,155 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Download, Database, Trash2, AlertTriangle, CheckCircle } from "lucide-react"
+import { Download, Database, Trash2, AlertTriangle, CheckCircle, Loader2, Lock, LogOut } from "lucide-react"
 import Link from "next/link"
 
 export default function SettingsPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loginData, setLoginData] = useState({ id: "", password: "" })
+  const [loginError, setLoginError] = useState("")
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
+  
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [exportFormat, setExportFormat] = useState("json")
   const [lastBackup, setLastBackup] = useState("2024-01-15")
+  const [isLoading, setIsLoading] = useState(true)
+  const [stats, setStats] = useState({
+    totalNotes: 0,
+    totalPapers: 0,
+    totalProjects: 0,
+    totalAchievements: 0,
+    totalTasks: 0,
+    totalExperts: 0,
+    totalMaterials: 0,
+  })
+
+  // 페이지 로드 시 로그인 상태 확인
+  useEffect(() => {
+    const savedAuth = localStorage.getItem('settings_authenticated')
+    if (savedAuth === 'true') {
+      setIsAuthenticated(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchStats()
+    }
+  }, [isAuthenticated])
+
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setIsLoggingIn(true)
+    setLoginError("")
+
+    // 인증 처리 (실제 환경에서는 더 안전한 방법 사용)
+    if (loginData.id === "estocada" && loginData.password === "3079") {
+      setIsAuthenticated(true)
+      localStorage.setItem('settings_authenticated', 'true')
+      setLoginData({ id: "", password: "" })
+    } else {
+      setLoginError("아이디 또는 비밀번호가 올바르지 않습니다.")
+    }
+    setIsLoggingIn(false)
+  }
+
+  const handleLogout = () => {
+    setIsAuthenticated(false)
+    localStorage.removeItem('settings_authenticated')
+    setLoginData({ id: "", password: "" })
+  }
+
+  const fetchStats = async () => {
+    try {
+      setIsLoading(true)
+      
+      // API 호출을 통해 통계 데이터 가져오기
+      const responses = await Promise.all([
+        fetch('/api/notes'),
+        fetch('/api/papers'),
+        fetch('/api/projects'),
+        fetch('/api/achievements'),
+        fetch('/api/tasks'),
+        fetch('/api/experts'),
+        fetch('/api/materials'),
+      ])
+
+      const [notes, papers, projects, achievements, tasks, experts, materials] = await Promise.all(
+        responses.map(response => response.ok ? response.json() : [])
+      )
+
+      setStats({
+        totalNotes: notes.length || 0,
+        totalPapers: papers.length || 0,
+        totalProjects: projects.length || 0,
+        totalAchievements: achievements.length || 0,
+        totalTasks: tasks.length || 0,
+        totalExperts: experts.length || 0,
+        totalMaterials: materials.length || 0,
+      })
+    } catch (error) {
+      console.error('통계 데이터를 가져오는데 실패했습니다:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleExportData = async () => {
     setIsExporting(true)
 
-    // 모의 데이터 생성
-    const mockData = {
-      notes: [
-        {
-          id: 1,
-          title: "미디어 리터러시 연구 아이디어",
-          content: "# 미디어 리터러시 연구\n\n디지털 시대의 미디어 리터러시 교육 방안에 대한 연구...",
-          tags: ["미디어", "교육", "리터러시"],
-          createdAt: "2024-01-15",
-          updatedAt: "2024-01-15",
-        },
-      ],
-      papers: [
-        {
-          id: 1,
-          title: "Digital Media and Democracy: Challenges and Opportunities",
-          authors: "Smith, J., Johnson, M.",
-          year: 2023,
-          publisher: "Journal of Media Studies",
-          notes: "민주주의에 대한 디지털 미디어의 영향을 분석한 중요한 연구.",
-          createdAt: "2024-01-15",
-        },
-      ],
-      projects: [
-        {
-          id: 1,
-          projectName: "미디어 리터러시 연구",
-          description: "디지털 시대의 미디어 리터러시 교육 방안 연구",
-          createdAt: "2024-01-01",
-        },
-      ],
-      tasks: [
-        {
-          id: 1,
-          projectId: 1,
-          taskName: "문헌 조사",
-          description: "미디어 리터러시 관련 기존 연구 조사",
-          dueDate: "2024-01-25",
-          status: "completed",
-          createdAt: "2024-01-15",
-        },
-      ],
-      achievements: [
-        {
-          id: 1,
-          title: "국제 미디어 학술대회 발표",
-          achievementDate: "2024-01-10",
-          description: "미디어 리터러시 교육 방안에 대한 연구 결과를 국제 학술대회에서 발표",
-          type: "presentation",
-          createdAt: "2024-01-10",
-        },
-      ],
-      exportDate: new Date().toISOString(),
-      version: "1.0",
-    }
+    try {
+      // 실제 데이터를 API에서 가져오기
+      const responses = await Promise.all([
+        fetch('/api/notes'),
+        fetch('/api/papers'),
+        fetch('/api/projects'),
+        fetch('/api/tasks'),
+        fetch('/api/achievements'),
+        fetch('/api/experts'),
+        fetch('/api/materials'),
+      ])
 
-    // 실제 구현에서는 실제 데이터를 가져와야 함
-    setTimeout(() => {
-      const dataStr = exportFormat === "json" ? JSON.stringify(mockData, null, 2) : convertToCSV(mockData)
+      const [notes, papers, projects, tasks, achievements, experts, materials] = await Promise.all(
+        responses.map(async (response) => {
+          if (response.ok) {
+            return await response.json()
+          }
+          return []
+        })
+      )
 
-      const dataBlob = new Blob([dataStr], {
-        type: exportFormat === "json" ? "application/json" : "text/csv",
+      const exportData = {
+        notes: notes || [],
+        papers: papers || [],
+        projects: projects || [],
+        tasks: tasks || [],
+        achievements: achievements || [],
+        experts: experts || [],
+        materials: materials || [],
+        exportDate: new Date().toISOString(),
+        version: "1.0",
+      }
+
+      const dataStr = exportFormat === "json" ? 
+        JSON.stringify(exportData, null, 2) : 
+        convertToCSV(exportData)
+
+      // CSV의 경우 UTF-8 BOM 추가하여 한글 깨짐 방지
+      const finalData = exportFormat === "csv" ? 
+        "\uFEFF" + dataStr : // UTF-8 BOM 추가
+        dataStr
+
+      const dataBlob = new Blob([finalData], {
+        type: exportFormat === "json" ? 
+          "application/json;charset=utf-8" : 
+          "text/csv;charset=utf-8",
       })
 
       const url = URL.createObjectURL(dataBlob)
@@ -91,26 +161,98 @@ export default function SettingsPage() {
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
 
-      setIsExporting(false)
       setLastBackup(new Date().toISOString().split("T")[0])
-    }, 2000)
+      alert(`데이터가 성공적으로 내보내졌습니다!\n- 노트: ${exportData.notes.length}개\n- 논문: ${exportData.papers.length}개\n- 프로젝트: ${exportData.projects.length}개\n- 작업: ${exportData.tasks.length}개\n- 성과: ${exportData.achievements.length}개\n- 전문가: ${exportData.experts.length}명\n- 자료: ${exportData.materials.length}개`)
+    } catch (error) {
+      console.error('데이터 내보내기 실패:', error)
+      alert('데이터를 내보내는 중 오류가 발생했습니다.')
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   const convertToCSV = (data) => {
-    // 간단한 CSV 변환 (실제 구현에서는 더 정교하게 구현)
-    let csv = "Type,Title,Description,Date\n"
+    let csv = "구분,제목,설명,작성자/저자,날짜,상태/정보\n"
 
-    data.notes.forEach((note) => {
-      csv += `Note,"${note.title}","${note.content.substring(0, 100)}","${note.createdAt}"\n`
-    })
+    // 노트 데이터
+    if (data.notes && data.notes.length > 0) {
+      data.notes.forEach((note) => {
+        const title = `"${(note.title || '').replace(/"/g, '""')}"`
+        const content = `"${(note.content || '').substring(0, 100).replace(/"/g, '""')}"`
+        const tags = `"${(note.tags || []).join(', ')}"`
+        const date = `"${new Date(note.createdAt || '').toLocaleDateString('ko-KR')}"`
+        csv += `노트,${title},${content},${tags},${date},\n`
+      })
+    }
 
-    data.papers.forEach((paper) => {
-      csv += `Paper,"${paper.title}","${paper.authors} (${paper.year})","${paper.createdAt}"\n`
-    })
+    // 논문 데이터
+    if (data.papers && data.papers.length > 0) {
+      data.papers.forEach((paper) => {
+        const title = `"${(paper.title || '').replace(/"/g, '""')}"`
+        const authors = `"${(paper.authors || '').replace(/"/g, '""')}"`
+        const publisher = `"${(paper.publisher || '').replace(/"/g, '""')}"`
+        const year = `"${paper.year || ''}"`
+        const date = `"${new Date(paper.createdAt || '').toLocaleDateString('ko-KR')}"`
+        csv += `논문,${title},${publisher},${authors},${date},${year}년\n`
+      })
+    }
 
-    data.achievements.forEach((achievement) => {
-      csv += `Achievement,"${achievement.title}","${achievement.description}","${achievement.achievementDate}"\n`
-    })
+    // 프로젝트 데이터
+    if (data.projects && data.projects.length > 0) {
+      data.projects.forEach((project) => {
+        const name = `"${(project.projectName || '').replace(/"/g, '""')}"`
+        const description = `"${(project.description || '').replace(/"/g, '""')}"`
+        const date = `"${new Date(project.createdAt || '').toLocaleDateString('ko-KR')}"`
+        csv += `프로젝트,${name},${description},,${date},\n`
+      })
+    }
+
+    // 작업 데이터
+    if (data.tasks && data.tasks.length > 0) {
+      data.tasks.forEach((task) => {
+        const name = `"${(task.taskName || '').replace(/"/g, '""')}"`
+        const description = `"${(task.description || '').replace(/"/g, '""')}"`
+        const status = `"${task.status || ''}"`
+        const dueDate = `"${task.dueDate ? new Date(task.dueDate).toLocaleDateString('ko-KR') : ''}"`
+        const date = `"${new Date(task.createdAt || '').toLocaleDateString('ko-KR')}"`
+        csv += `작업,${name},${description},,${date},${status} (마감: ${dueDate})\n`
+      })
+    }
+
+    // 성과 데이터
+    if (data.achievements && data.achievements.length > 0) {
+      data.achievements.forEach((achievement) => {
+        const title = `"${(achievement.title || '').replace(/"/g, '""')}"`
+        const description = `"${(achievement.description || '').replace(/"/g, '""')}"`
+        const type = `"${achievement.type || ''}"`
+        const date = `"${new Date(achievement.achievementDate || '').toLocaleDateString('ko-KR')}"`
+        csv += `성과,${title},${description},,${date},${type}\n`
+      })
+    }
+
+    // 전문가 데이터
+    if (data.experts && data.experts.length > 0) {
+      data.experts.forEach((expert) => {
+        const name = `"${(expert.name || '').replace(/"/g, '""')}"`
+        const field = `"${(expert.field || '').replace(/"/g, '""')}"`
+        const institution = `"${(expert.institution || '').replace(/"/g, '""')}"`
+        const contact = `"${(expert.contact || '').replace(/"/g, '""')}"`
+        const date = `"${new Date(expert.createdAt || '').toLocaleDateString('ko-KR')}"`
+        csv += `전문가,${name},${field},${institution},${date},${contact}\n`
+      })
+    }
+
+    // 자료 데이터
+    if (data.materials && data.materials.length > 0) {
+      data.materials.forEach((material) => {
+        const title = `"${(material.title || '').replace(/"/g, '""')}"`
+        const description = `"${(material.description || '').replace(/"/g, '""')}"`
+        const type = `"${material.type || ''}"`
+        const url = `"${(material.url || '').replace(/"/g, '""')}"`
+        const date = `"${new Date(material.createdAt || '').toLocaleDateString('ko-KR')}"`
+        csv += `자료,${title},${description},,${date},${type} (${url})\n`
+      })
+    }
 
     return csv
   }
@@ -147,6 +289,84 @@ export default function SettingsPage() {
     }
   }
 
+  // 로그인이 되지 않은 경우 로그인 폼 표시
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full space-y-8">
+          <div>
+            <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm mb-4 block text-center">
+              ← 대시보드로 돌아가기
+            </Link>
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <Lock className="w-8 h-8 text-blue-600" />
+              </div>
+            </div>
+            <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+              설정 페이지 접근
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              관리자 권한이 필요합니다. 로그인해주세요.
+            </p>
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <Label htmlFor="id">아이디</Label>
+                  <Input
+                    id="id"
+                    type="text"
+                    value={loginData.id}
+                    onChange={(e) => setLoginData(prev => ({ ...prev, id: e.target.value }))}
+                    placeholder="아이디를 입력하세요"
+                    required
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="password">비밀번호</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={loginData.password}
+                    onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                    placeholder="비밀번호를 입력하세요"
+                    required
+                    className="mt-1"
+                  />
+                </div>
+                {loginError && (
+                  <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded">
+                    {loginError}
+                  </div>
+                )}
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoggingIn}
+                >
+                  {isLoggingIn ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      로그인 중...
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4 mr-2" />
+                      로그인
+                    </>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm border-b">
@@ -159,6 +379,10 @@ export default function SettingsPage() {
               <h1 className="text-3xl font-bold text-gray-900">설정</h1>
               <p className="text-gray-600 mt-1">데이터 백업 및 시스템 설정을 관리하세요</p>
             </div>
+            <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+              <LogOut className="w-4 h-4" />
+              로그아웃
+            </Button>
           </div>
         </div>
       </header>
@@ -252,24 +476,43 @@ export default function SettingsPage() {
               <CardDescription>현재 시스템 상태와 통계 정보입니다.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">24</div>
-                  <div className="text-sm text-gray-600">총 노트</div>
+              {isLoading ? (
+                <div className="flex justify-center items-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                  <span className="ml-2 text-gray-600">통계를 불러오는 중...</span>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">18</div>
-                  <div className="text-sm text-gray-600">논문 자료</div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-900">{stats.totalNotes}</div>
+                    <div className="text-sm text-gray-600">총 노트</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-900">{stats.totalPapers}</div>
+                    <div className="text-sm text-gray-600">논문 자료</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-900">{stats.totalProjects}</div>
+                    <div className="text-sm text-gray-600">프로젝트</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-900">{stats.totalAchievements}</div>
+                    <div className="text-sm text-gray-600">연구 성과</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-900">{stats.totalTasks}</div>
+                    <div className="text-sm text-gray-600">작업</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-900">{stats.totalExperts}</div>
+                    <div className="text-sm text-gray-600">전문가</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-900">{stats.totalMaterials}</div>
+                    <div className="text-sm text-gray-600">관련 자료</div>
+                  </div>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">3</div>
-                  <div className="text-sm text-gray-600">프로젝트</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">7</div>
-                  <div className="text-sm text-gray-600">연구 성과</div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 
@@ -311,17 +554,60 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">빌드 날짜</span>
-                  <span>2024-01-15</span>
+                  <span>{new Date().toISOString().split('T')[0]}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">기술 스택</span>
-                  <span>Next.js, SQLite</span>
+                  <span>Next.js, PostgreSQL, Prisma</span>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
       </main>
+
+      {/* 푸터 */}
+      <footer className="bg-gray-900 text-white mt-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {/* 시스템 정보 */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">언론재단 이박사의 연구관리 시스템</h3>
+              <p className="text-gray-300 text-sm">
+                언론 분야 연구를 체계적으로 관리하는 통합 플랫폼입니다.
+              </p>
+            </div>
+
+            {/* 기술 스택 */}
+            <div>
+              <h4 className="text-md font-semibold mb-3">기술 스택</h4>
+              <div className="space-y-1 text-sm text-gray-300">
+                <div>• Frontend: Next.js, React, TypeScript</div>
+                <div>• UI: Tailwind CSS, Radix UI</div>
+                <div>• Database: PostgreSQL, Prisma ORM</div>
+                <div>• Storage: UploadThing</div>
+              </div>
+            </div>
+
+            {/* 개발 정보 */}
+            <div>
+              <h4 className="text-md font-semibold mb-3">개발 정보</h4>
+              <div className="space-y-1 text-sm text-gray-300">
+                <div>• 개발자: 이현우</div>
+                <div>• 제작연도: 2025</div>
+                <div>• 버전: 1.0.0</div>
+                <div>• 최종 업데이트: {new Date().toLocaleDateString('ko-KR')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-700 mt-6 pt-6 text-center">
+            <p className="text-sm text-gray-400">
+              © 2025 언론재단 이박사의 연구관리 시스템. Developed by 이현우. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
