@@ -31,29 +31,59 @@ export default function Dashboard() {
         setError("")
 
         // 노트 데이터 가져오기
+        console.log('Fetching notes...');
         const notesResponse = await fetch('/api/notes')
-        if (!notesResponse.ok) throw new Error("노트 데이터를 불러오는데 실패했습니다")
+        if (!notesResponse.ok) {
+          const errorText = await notesResponse.text();
+          console.error('Notes API error:', notesResponse.status, errorText);
+          throw new Error(`노트 데이터를 불러오는데 실패했습니다 (${notesResponse.status}): ${errorText}`)
+        }
         const notesData = await notesResponse.json()
+        console.log('Notes data loaded:', notesData.length, 'items');
         
         // 논문 데이터 가져오기
+        console.log('Fetching papers...');
         const papersResponse = await fetch('/api/papers')
-        if (!papersResponse.ok) throw new Error("논문 데이터를 불러오는데 실패했습니다")
+        if (!papersResponse.ok) {
+          const errorText = await papersResponse.text();
+          console.error('Papers API error:', papersResponse.status, errorText);
+          throw new Error(`논문 데이터를 불러오는데 실패했습니다 (${papersResponse.status}): ${errorText}`)
+        }
         const papersData = await papersResponse.json()
+        console.log('Papers data loaded:', papersData.length, 'items');
         
         // 프로젝트 데이터 가져오기
+        console.log('Fetching projects...');
         const projectsResponse = await fetch('/api/projects')
-        if (!projectsResponse.ok) throw new Error("프로젝트 데이터를 불러오는데 실패했습니다")
+        if (!projectsResponse.ok) {
+          const errorText = await projectsResponse.text();
+          console.error('Projects API error:', projectsResponse.status, errorText);
+          throw new Error(`프로젝트 데이터를 불러오는데 실패했습니다 (${projectsResponse.status}): ${errorText}`)
+        }
         const projectsData = await projectsResponse.json()
+        console.log('Projects data loaded:', projectsData.length, 'items');
         
         // 태스크 데이터 가져오기
+        console.log('Fetching tasks...');
         const tasksResponse = await fetch('/api/tasks')
-        if (!tasksResponse.ok) throw new Error("태스크 데이터를 불러오는데 실패했습니다")
+        if (!tasksResponse.ok) {
+          const errorText = await tasksResponse.text();
+          console.error('Tasks API error:', tasksResponse.status, errorText);
+          throw new Error(`태스크 데이터를 불러오는데 실패했습니다 (${tasksResponse.status}): ${errorText}`)
+        }
         const tasksData = await tasksResponse.json()
+        console.log('Tasks data loaded:', tasksData.length, 'items');
         
         // 성과 데이터 가져오기
+        console.log('Fetching achievements...');
         const achievementsResponse = await fetch('/api/achievements')
-        if (!achievementsResponse.ok) throw new Error("성과 데이터를 불러오는데 실패했습니다")
+        if (!achievementsResponse.ok) {
+          const errorText = await achievementsResponse.text();
+          console.error('Achievements API error:', achievementsResponse.status, errorText);
+          throw new Error(`성과 데이터를 불러오는데 실패했습니다 (${achievementsResponse.status}): ${errorText}`)
+        }
         const achievementsData = await achievementsResponse.json()
+        console.log('Achievements data loaded:', achievementsData.length, 'items');
 
         // 통계 설정
         setStats({
