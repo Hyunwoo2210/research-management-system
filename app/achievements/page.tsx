@@ -287,8 +287,8 @@ export default function AchievementsPage() {
                                   <div className="p-2 bg-blue-100 rounded-lg">
                                     <Icon className="w-5 h-5 text-blue-600" />
                                   </div>
-                                  <div className="flex-1">
-                                    <CardTitle className="text-lg">{achievement.title}</CardTitle>
+                                  <div className="flex-1 min-w-0">
+                                    <CardTitle className="text-lg break-words line-clamp-2">{achievement.title}</CardTitle>
                                     <div className="flex items-center gap-2 mt-1">
                                       <Badge variant="secondary">{typeInfo.label}</Badge>
                                       <span className="text-sm text-gray-500">{new Date(achievement.achievementDate).toLocaleDateString()}</span>
@@ -326,7 +326,9 @@ export default function AchievementsPage() {
                                 setIsViewDialogOpen(true)
                               }}
                             >
-                              <p className="text-gray-600">{achievement.description}</p>
+                              <p className="text-gray-600 break-words line-clamp-3 overflow-hidden text-ellipsis">
+                                {achievement.description}
+                              </p>
                             </CardContent>
                           </Card>
                         )
@@ -439,11 +441,11 @@ function AchievementViewDialog({ achievement, onEdit, onDelete, onClose }) {
   return (
     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle className="text-2xl flex items-center gap-3">
-          <div className="p-3 bg-blue-100 rounded-lg">
+        <DialogTitle className="text-2xl flex items-center gap-3 break-words">
+          <div className="p-3 bg-blue-100 rounded-lg flex-shrink-0">
             <Icon className="w-6 h-6 text-blue-600" />
           </div>
-          {achievement.title}
+          <span className="break-words overflow-wrap-anywhere">{achievement.title}</span>
         </DialogTitle>
         <DialogDescription className="text-lg">
           <div className="flex items-center gap-3 mt-2">
@@ -463,9 +465,9 @@ function AchievementViewDialog({ achievement, onEdit, onDelete, onClose }) {
           <div>
             <h4 className="font-semibold text-lg mb-3">상세 설명</h4>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <div className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">
                 {achievement.description}
-              </p>
+              </div>
             </div>
           </div>
         )}
