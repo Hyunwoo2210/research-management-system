@@ -274,28 +274,32 @@ export default function AchievementsPage() {
                         const typeInfo = getTypeInfo(achievement.type)
                         const Icon = typeInfo.icon
                         return (
-                          <Card key={achievement.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                            <CardHeader>
-                              <div className="flex justify-between items-start">
+                          <Card key={achievement.id} className="hover:shadow-md transition-shadow cursor-pointer overflow-hidden">
+                            <CardHeader className="pb-3">
+                              <div className="flex justify-between items-start gap-3">
                                 <div 
-                                  className="flex items-start gap-3 flex-1"
+                                  className="flex items-start gap-3 flex-1 min-w-0 overflow-hidden"
                                   onClick={() => {
                                     setViewingAchievement(achievement)
                                     setIsViewDialogOpen(true)
                                   }}
                                 >
-                                  <div className="p-2 bg-blue-100 rounded-lg">
+                                  <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
                                     <Icon className="w-5 h-5 text-blue-600" />
                                   </div>
-                                  <div className="flex-1 min-w-0">
-                                    <CardTitle className="text-lg break-words line-clamp-2">{achievement.title}</CardTitle>
-                                    <div className="flex items-center gap-2 mt-1">
-                                      <Badge variant="secondary">{typeInfo.label}</Badge>
-                                      <span className="text-sm text-gray-500">{new Date(achievement.achievementDate).toLocaleDateString()}</span>
+                                  <div className="flex-1 min-w-0 overflow-hidden">
+                                    <CardTitle className="text-lg break-words line-clamp-2 overflow-hidden text-ellipsis">
+                                      {achievement.title}
+                                    </CardTitle>
+                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                      <Badge variant="secondary" className="flex-shrink-0">{typeInfo.label}</Badge>
+                                      <span className="text-sm text-gray-500 flex-shrink-0">
+                                        {new Date(achievement.achievementDate).toLocaleDateString()}
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
-                                <div className="flex gap-1">
+                                <div className="flex gap-1 flex-shrink-0">
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -321,14 +325,15 @@ export default function AchievementsPage() {
                               </div>
                             </CardHeader>
                             <CardContent 
+                              className="pt-0 overflow-hidden"
                               onClick={() => {
                                 setViewingAchievement(achievement)
                                 setIsViewDialogOpen(true)
                               }}
                             >
-                              <p className="text-gray-600 break-words line-clamp-3 overflow-hidden text-ellipsis">
+                              <div className="text-gray-600 break-all line-clamp-3 overflow-hidden text-ellipsis leading-relaxed">
                                 {achievement.description}
-                              </p>
+                              </div>
                             </CardContent>
                           </Card>
                         )
@@ -441,31 +446,33 @@ function AchievementViewDialog({ achievement, onEdit, onDelete, onClose }) {
   return (
     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle className="text-2xl flex items-center gap-3 break-words">
+        <DialogTitle className="text-2xl flex items-start gap-3 break-words pr-8">
           <div className="p-3 bg-blue-100 rounded-lg flex-shrink-0">
             <Icon className="w-6 h-6 text-blue-600" />
           </div>
-          <span className="break-words overflow-wrap-anywhere">{achievement.title}</span>
+          <span className="break-all overflow-wrap-anywhere leading-tight">
+            {achievement.title}
+          </span>
         </DialogTitle>
         <DialogDescription className="text-lg">
-          <div className="flex items-center gap-3 mt-2">
-            <Badge variant="secondary" className="text-sm px-3 py-1">
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
+            <Badge variant="secondary" className="text-sm px-3 py-1 flex-shrink-0">
               {typeInfo.label}
             </Badge>
-            <span className="text-gray-600">
+            <span className="text-gray-600 flex-shrink-0">
               {new Date(achievement.achievementDate).toLocaleDateString()}
             </span>
           </div>
         </DialogDescription>
       </DialogHeader>
       
-      <div className="space-y-6">
+      <div className="space-y-6 overflow-hidden">
         {/* 설명 */}
         {achievement.description && (
-          <div>
+          <div className="overflow-hidden">
             <h4 className="font-semibold text-lg mb-3">상세 설명</h4>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">
+            <div className="bg-gray-50 p-4 rounded-lg overflow-hidden">
+              <div className="text-gray-700 leading-relaxed break-all overflow-wrap-anywhere whitespace-pre-wrap">
                 {achievement.description}
               </div>
             </div>
@@ -473,20 +480,20 @@ function AchievementViewDialog({ achievement, onEdit, onDelete, onClose }) {
         )}
         
         {/* 메타데이터 */}
-        <div>
+        <div className="overflow-hidden">
           <h4 className="font-semibold text-lg mb-3">정보</h4>
-          <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="font-medium text-gray-600">성과 유형:</span>
-              <span>{typeInfo.label}</span>
+          <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm overflow-hidden">
+            <div className="flex justify-between items-start gap-2">
+              <span className="font-medium text-gray-600 flex-shrink-0">성과 유형:</span>
+              <span className="break-words text-right">{typeInfo.label}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="font-medium text-gray-600">성과 날짜:</span>
-              <span>{new Date(achievement.achievementDate).toLocaleDateString()}</span>
+            <div className="flex justify-between items-start gap-2">
+              <span className="font-medium text-gray-600 flex-shrink-0">성과 날짜:</span>
+              <span className="break-words text-right">{new Date(achievement.achievementDate).toLocaleDateString()}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="font-medium text-gray-600">등록일:</span>
-              <span>{new Date(achievement.createdAt).toLocaleDateString()}</span>
+            <div className="flex justify-between items-start gap-2">
+              <span className="font-medium text-gray-600 flex-shrink-0">등록일:</span>
+              <span className="break-words text-right">{new Date(achievement.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
         </div>
