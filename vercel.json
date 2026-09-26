@@ -4,5 +4,6 @@
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
-  }
+  },
+  "installCommand": "pnpm install --no-frozen-lockfile"
 }
